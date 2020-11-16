@@ -1,0 +1,10 @@
+--- dwm.c
++++ dwm.c
+@@ -161,6 +161,7 @@ static void destroynotify(XEvent *e);
+ static void detach(Client *c);
+ static void detachstack(Client *c);
+ static Monitor *dirtomon(int dir);
++static void doubledeck(Monitor *m);
+ static void drawbar(Monitor *m);
+ static void drawbars(void);
+ static void enternotify(XEvent *e);

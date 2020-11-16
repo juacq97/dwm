@@ -1,0 +1,76 @@
+From c29cee8186c9a8d117a128b6848afb08035961c1 Mon Sep 17 00:00:00 2001
+From: Miles Alan <m@milesalan.com>
+Date: Mon, 17 Aug 2020 20:57:03 -0500
+Subject: [PATCH] Add doubledeck layout function and bind to MOD+r
+
+The doubledeck layout is like the deck layout, which stacks clients one ontop
+of another in the stack area, however the doubledeck variant additionally
+stacks clients one ontop of eachother in the master area.
+---
+ config.def.h |  2 ++
+ dwm.c        | 22 ++++++++++++++++++++++
+ 2 files changed, 24 insertions(+)
+
+diff --git a/config.def.h b/config.def.h
+index 1c0b587..6538420 100644
+--- a/config.def.h
++++ b/config.def.h
+@@ -41,6 +41,7 @@ static const Layout layouts[] = {
+ 	{ "[]=",      tile },    /* first entry is default */
+ 	{ "><>",      NULL },    /* no layout function means floating behavior */
+ 	{ "[M]",      monocle },
++	{ "DD",       doubledeck },
+ };
+ 
+ /* key definitions */
+@@ -76,6 +77,7 @@ static Key keys[] = {
+ 	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} },
+ 	{ MODKEY,                       XK_f,      setlayout,      {.v = &layouts[1]} },
+ 	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} },
++	{ MODKEY,                       XK_r,      setlayout,      {.v = &layouts[3]} },
+ 	{ MODKEY,                       XK_space,  setlayout,      {0} },
+ 	{ MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },
+ 	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } },
+diff --git a/dwm.c b/dwm.c
+index 4465af1..ce29fb4 100644
+--- a/dwm.c
++++ b/dwm.c
+@@ -161,6 +161,7 @@ static void destroynotify(XEvent *e);
+ static void detach(Client *c);
+ static void detachstack(Client *c);
+ static Monitor *dirtomon(int dir);
++static void doubledeck(Monitor *m);
+ static void drawbar(Monitor *m);
+ static void drawbars(void);
+ static void enternotify(XEvent *e);
+@@ -692,6 +693,27 @@ dirtomon(int dir)
+ 	return m;
+ }
+ 
++void
++doubledeck(Monitor *m) {
++	unsigned int i, n, mw;
++	Client *c;
++
++	for(n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
++	if(n == 0)
++		return;
++
++	if(n > m->nmaster)
++		mw = m->nmaster ? m->ww * m->mfact : 0;
++	else
++		mw = m->ww;
++
++	for(i = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
++		if(i < m->nmaster)
++			resize(c, m->wx, m->wy, mw - (2*c->bw), m->wh - (2*c->bw), False);
++		else
++			resize(c, m->wx + mw, m->wy, m->ww - mw - (2*c->bw), m->wh - (2*c->bw), False);
++}
++
+ void
+ drawbar(Monitor *m)
+ {
+-- 
+2.25.4
+
