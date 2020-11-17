@@ -1,28 +1,35 @@
-/* See LICENSE file for copyright and license details. */
+
+/*                          __ _         _     
+*           ___ ___  _ __  / _(_) __ _  | |__  
+*          / __/ _ \| '_ \| |_| |/ _` | | '_ \ 
+*         | (_| (_) | | | |  _| | (_| |_| | | |
+*          \___\___/|_| |_|_| |_|\__, (_)_| |_|
+*                                |___/         
+*	dwm's configuration file (yes, config file)
+*/
 
 /* appearance */
-static const unsigned int borderpx  = 2;        /* border pixel of windows */
-static const unsigned int snap      = 6;       /* snap pixel */
-static const unsigned int gappih    = 8;       /* horiz inner gap between windows */
-static const unsigned int gappiv    = 8;       /* vert inner gap between windows */
-static const unsigned int gappoh    = 6;       /* horiz outer gap between windows and screen edge */
-static const unsigned int gappov    = 6;       /* vert outer gap between windows and screen edge */
-static       int smartgaps          = 0;        /* 1 means no outer gap when there is only one window */
-static const int user_bh            = 25;        /* 0 means that dwm will calculate bar height, >= 1 means dwm will user_bh as bar height */
-static const int showbar            = 1;        /* 0 means no bar */
-static int floatposgrid_x           = 5;        /* float grid columns */
-static int floatposgrid_y           = 5;        /* float grid rows */
-static const int topbar             = 1;        /* 0 means bottom bar */
-static const int attachmode         = 2;        /* 0 master (default), 1 = above, 2 = aside, 3 = below, 4 = bottom */
+static const unsigned int borderpx  = 2;       
+static const unsigned int snap      = 6;      
+static const unsigned int gappih    = 8;      
+static const unsigned int gappiv    = 8;      
+static const unsigned int gappoh    = 6;      
+static const unsigned int gappov    = 6;      
+static       int smartgaps          = 0;  /* 1 means no gap with one window */
+static const int user_bh            = 25; /* 0 means height equal to font size */
+static const int showbar            = 1;  /* 0 means no bar */
+static int floatposgrid_x           = 5;  
+static int floatposgrid_y           = 5;  
+static const int topbar             = 1;  /* 0 means bottom bar */
+static const int attachmode         = 2;  /* 0 master (default), 1 = above, 2 = aside, 3 = below, 4 = bottom */
 static const char *fonts[]          = {"Futura Bk BT:Book:size=10", "Material Design Icons:Regular:pixelsize=16:antialias=true"};
-static const char dmenufont[]       = "monospace:size=10";
 
-#include "colors/horizon.h"
-static const char spotify[]= "#1FC167";
+#include "colors/horizon.h" //Colorscheme
+static const char spotify[]= "#1FC167"; //Spotify green
 
-
+/* Here is the color array. Check the 'color.h' file to see the names' */
 static const char *colors[][3]      = {
-	/*               fg         bg         border   */
+	/*               fg         bg         border           code */
 	[SchemeNorm]     = { fore,      back,      back   }, // \x0b
 	[SchemeSel]      = { fore,      back,      col4   }, // \x0c
 	[SchemeStatus]   = { fore,      back,      border }, // \x0d
@@ -44,8 +51,9 @@ static const char *colors[][3]      = {
 	[SchemeCol12]    = { spotify,   back,      col0   }, // \x1d
 };
 
-static const unsigned int baralpha = 0xd0;
-static const unsigned int borderalpha = OPAQUE;
+/* Here's the alpha array, needed to have nice transparency */
+static const unsigned int baralpha = 0xd0; //The alpha channel
+static const unsigned int borderalpha = OPAQUE; // The border alpha channel
 static const unsigned int alphas[][3]      = {
 	/*               fg      bg        border     */
     [SchemeNorm]     = { OPAQUE,    baralpha,   borderalpha },
@@ -85,33 +93,29 @@ static const Rule rules[] = {
   { "qt5ct",         NULL,       NULL,       0,            1,         NULL,       -1 },
   { "Gucharmap",     NULL,       NULL,       0,            1,         NULL,       -1 },
   { "Sxiv",          NULL,       NULL,       0,            1,         NULL,       -1 },
-  { "Toolkit",       NULL,       NULL,       0,            1,         NULL,       -1 },
   { "kruler",        NULL,       NULL,       0,            1,         NULL,       -1 },
-  { "Emacs",         NULL,       "agenda",   0,            1,         NULL,       -1 },
   { "zoom",          NULL,       NULL,       0,            1,         NULL,       -1 },
   { "Connman-gtk",   NULL,       NULL,       0,            1,         NULL,       -1 },
   { "Alacritty", "calendar.txt", NULL,       0,            1,         NULL,       -1 },
 };
 
 /* layout(s) */
-static const float mfact     = 0.5; /* factor of master area size [0.05..0.95] */
-static const int nmaster     = 1;    /* number of clients in master area */
-static const int resizehints = 0;    /* 1 means respect size hints in tiled resizals */
-
-
+static const float mfact     = 0.5; /* factor of master area */
+static const int nmaster     = 1;    /* clients in master */
+static const int resizehints = 0;    /* 1 means respect size hints */
 
 #define FORCE_VSPLIT 1  /* nrowgrid layout: force two clients to always split vertically */
 #include "vanitygaps.c"
 
+/* Here's the layouts. The count starts with zero */
 static const Layout layouts[] = {
 	/* symbol     arrange function */
-	{ "󰙀",      tile },    /* first entry is default */
-	{ "󱒅",      centeredmaster },
-	{ "󰋁",      gaplessgrid },
-	{ "[M]",      monocle },
-	{ "[D]",      deck },
-	{ "><>",     NULL },
-	{ NULL, NULL },
+	{ "󰙀",           tile }, 
+	{ "󱒅",           centeredmaster },
+	{ "󰋁",           gaplessgrid },
+	{ "[M]",         monocle },
+	{ "[D]",         deck },
+	{ NULL,          NULL },
 };
 
 /* key definitions */
@@ -121,73 +125,72 @@ static const Layout layouts[] = {
 	{ MODKEY|Mod1Mask,		KEY,      toggleview,     {.ui = 1 << TAG} }, \
 	{ MODKEY|ShiftMask,             KEY,      tag,            {.ui = 1 << TAG} }, \
 	{ MODKEY|ControlMask,           KEY,      toggletag,      {.ui = 1 << TAG} },
- 
 
-
+/* keybindings! Here's only the dwm-related keybindings. To launch apps I use sxhkd */
 #include "movestack.c"
 #include "shiftview.c"
 static Key keys[] = {
 	/* modifier                     key        function        argument */
-		     /* Movimiento de ventanas */
 
-		     { MODKEY|ShiftMask,             XK_q,      killclient,     {0} }, /*Matar ventana*/
-		     { MODKEY,                       XK_j,      focusstack,     {.i = +1 } }, /*Enfocar siguiente ventana*/
-		     { MODKEY,                       XK_k,      focusstack,     {.i = -1 } }, /*Enfocar anterior ventana*/
-		     { MODKEY|ControlMask,           XK_j,      inplacerotate,  {.i = +1} }, /*Enfocar siguiente ventana sin cambiar con master (usar con deck)*/
-		     { MODKEY|ControlMask,           XK_k,      inplacerotate,  {.i = -1} }, /*Enfocar anterior ventana sin cambiar con master (usar con deck)*/
-		     { MODKEY|ShiftMask,             XK_g,      zoom,           {0} }, /*mandar ventana a master*/
-		     { MODKEY,                       XK_g,      switchcol,    {0} }, /*Cambiar foco entre stack y master*/
-		     { MODKEY,                       XK_h,      setmfact,       {.f = -0.05} }, /*Hacer más pequeño master*/
-		     { MODKEY,                       XK_l,      setmfact,       {.f = +0.05} }, /*Hacer más grande master*/
-		     { MODKEY|ControlMask,           XK_comma,  incnmaster,     {.i = +1 } }, /*Incrementar master*/
-		     { MODKEY|ControlMask,           XK_period, incnmaster,     {.i = -1 } }, /*Disminuir master*/
-		     { MODKEY|ShiftMask,             XK_j,      movestack,      {.i = +1 } }, /*Mover ventana hacia abajo*/
-		     { MODKEY|ShiftMask,             XK_k,      movestack,      {.i = -1 } }, /*Mover ventana hacia arriba*/
+	/*About windows */
+	{ MODKEY|ShiftMask,             XK_q,      killclient,     {0} }, 
+        { MODKEY,                       XK_j,      focusstack,     {.i = +1 } }, 
+        { MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
+        { MODKEY|ControlMask,           XK_j,      inplacerotate,  {.i = +1} }, 
+        { MODKEY|ControlMask,           XK_k,      inplacerotate,  {.i = -1} }, 
+        { MODKEY|ShiftMask,             XK_g,      zoom,           {0} }, //send window to master
+        { MODKEY,                       XK_g,      switchcol,      {0} }, //swap focus between master and stack
+        { MODKEY,                       XK_h,      setmfact,       {.f = -0.05} }, // Shrink master
+        { MODKEY,                       XK_l,      setmfact,       {.f = +0.05} }, //Grow master
+        { MODKEY|ControlMask,           XK_comma,  incnmaster,     {.i = +1 } }, 
+        { MODKEY|ControlMask,           XK_period, incnmaster,     {.i = -1 } }, 
+        { MODKEY|ShiftMask,             XK_j,      movestack,      {.i = +1 } }, 
+        { MODKEY|ShiftMask,             XK_k,      movestack,      {.i = -1 } }, 
 
-		     /* Tags*/
-		     { MODKEY,                       XK_Tab,    view,           {0} }, /*tag anterior*/
-		     { MODKEY,                       XK_0,      view,           {.ui = ~0 } }, /*ver todos los tags a la vez*/
-		     { MODKEY,                       XK_0,      setlayout,      {.v = &layouts[2]} }, /*Grid*/
-		     { MODKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } }, /*ventana enfocada en todos los tags*/
-		     { MODKEY|ShiftMask,             XK_o,      winview,        {0} }, // Ir al tag de la ventana enfocada
-		     { MODKEY|ShiftMask,             XK_o,      setlayout,      {.v = &layouts[0]} }, /*tiled*/
-		     { MODKEY|ControlMask,           XK_l,      shiftview,      { .i = +1 } }, /*Ver siguiente tag*/
-		     { MODKEY|ControlMask,           XK_h,      shiftview,      { .i = -1 } }, /*Ver tag anterior*/
-		     TAGKEYS(                        XK_1,                      0) /*Enfocar tag 1*/ 
-		     TAGKEYS(                        XK_2,                      1) /*Enfocar tag 2*/
-		     TAGKEYS(                        XK_3,                      2) /*Enfocar tag 3*/
-		     TAGKEYS(                        XK_4,                      3) /*Enfocar tag 4*/
-		     TAGKEYS(                        XK_5,                      4) /*Enfocar tag 5*/
-		     TAGKEYS(                        XK_6,                      5) /*Enfocar tag 6*/
-		     TAGKEYS(                        XK_7,                      6) /*Enfocar tag 7*/
-		     TAGKEYS(                        XK_8,                      7) /*Enfocar tag 8*/
-		     TAGKEYS(                        XK_9,                      8) /*Enfocar tag 9*/
+	/* About tags (desktops) */
+	{ MODKEY,                       XK_Tab,    view,           {0} }, // Prev tag
+	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } }, // View all tags
+	{ MODKEY,                       XK_0,      setlayout,      {.v = &layouts[2]} }, // Grid for all tags
+	{ MODKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } }, // Window on all tags
+	{ MODKEY|ShiftMask,             XK_o,      winview,        {0} }, //follow window on viewall
+	{ MODKEY|ShiftMask,             XK_o,      setlayout,      {.v = &layouts[0]} }, /*tiled*/
+	{ MODKEY|ControlMask,           XK_l,      shiftview,      { .i = +1 } }, // Next tag
+	{ MODKEY|ControlMask,           XK_h,      shiftview,      { .i = -1 } }, // prev tag
+	TAGKEYS(                        XK_1,                      0) /*Activate tag 1*/ 
+	TAGKEYS(                        XK_2,                      1) /*Activate tag 2*/
+	TAGKEYS(                        XK_3,                      2) /*Activate tag 3*/
+	TAGKEYS(                        XK_4,                      3) /*Activate tag 4*/
+	TAGKEYS(                        XK_5,                      4) /*Activate tag 5*/
+	TAGKEYS(                        XK_6,                      5) /*Activate tag 6*/
+	TAGKEYS(                        XK_7,                      6) /*Activate tag 7*/
+	TAGKEYS(                        XK_8,                      7) /*Activate tag 8*/
+	TAGKEYS(                        XK_9,                      8) /*Activate tag 9*/
 
-		     /*Layouts*/
-		     { MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} }, /*tiled*/
-		     { MODKEY|Mod1Mask,              XK_c,      setlayout,      {.v = &layouts[1]} }, /*center*/
-		     { MODKEY,                       XK_m,      setlayout,      {.v = &layouts[3]} }, /*monocle*/
-		     { MODKEY|ShiftMask,             XK_m,      setlayout,      {.v = &layouts[4]} }, /*Deck*/
-		     { MODKEY,                       XK_s,      togglefloating, {0} }, /*float*/
-		     { MODKEY,			     XK_F11,    togglefullscreen,  {0} }, /*Fullscreen*/
-		     { MODKEY|ShiftMask,	     XK_F11,    togglefakefullscreen,  {0} }, /*Fullscreen*/
-		     { MODKEY|Mod1Mask,              XK_comma,  cyclelayout,    {.i = -1 } }, /*Ciclar layouts*/
-		     { MODKEY|Mod1Mask,              XK_period, cyclelayout,    {.i = +1 } }, /*Ciclar layouts*/
+	/*About layouts*/
+	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} }, /*tiled*/
+	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[3]} }, /*monocle*/
+	{ MODKEY|ShiftMask,             XK_m,      setlayout,      {.v = &layouts[4]} }, /*Deck*/
+	{ MODKEY,                       XK_s,      togglefloating, {0} }, 
+	{ MODKEY,			XK_F11,    togglefullscreen,  {0} }, 
+	{ MODKEY|ShiftMask,	     	XK_F11,    togglefakefullscreen,  {0} }, // Fullscreen on the tile
+	{ MODKEY|Mod1Mask,              XK_comma,  cyclelayout,    {.i = -1 } }, 
+	{ MODKEY|Mod1Mask,              XK_period, cyclelayout,    {.i = +1 } }, 
 
-		     /*Monitores*/
-		     { MODKEY,                       XK_comma,  focusmon,       {.i = -1 } }, /*Enfocar siguiente monitor*/
-		     { MODKEY,                       XK_period, focusmon,       {.i = +1 } }, /*Enfocar siguiente monitor*/
-		     { MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } }, /*Mandar ventana a monitor anterior*/
-		     { MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } }, /*Mandar ventana a monitor siguiente*/
-       // 	     { MODKEY|Mod1Mask|ControlMask,  XK_comma,  tagswapmon,     {.i = +1 } }, // Intercambiar con monitor izquierdo
-       // 	     { MODKEY|Mod1Mask|ControlMask,  XK_period, tagswapmon,     {.i = -1 } }, // intercambiar con monitor derecho
+	/*About monitors*/
+	{ MODKEY,                       XK_comma,  focusmon,       {.i = -1 } }, 
+	{ MODKEY,                       XK_period, focusmon,       {.i = +1 } }, 
+	{ MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } }, 
+	{ MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } }, 
+       //{ MODKEY|Mod1Mask|ControlMask,  XK_comma,  tagswapmon,     {.i = +1 } }, // Intercambiar con monitor izquierdo
+       //{ MODKEY|Mod1Mask|ControlMask,  XK_period, tagswapmon,     {.i = -1 } }, // intercambiar con monitor derecho
 
-		     /* dwm especifico*/
-		     { MODKEY,                       XK_b,      togglebar,      {0} }, /*Activar o desactivar panel*/
-                     { MODKEY|Mod1Mask,              XK_l,      setcfact,       {.f = +0.25} },
-                     { MODKEY|Mod1Mask,              XK_h,      setcfact,       {.f = -0.25} },
-                     { MODKEY|Mod1Mask,              XK_o,      setcfact,       {.f =  0.00} },
+	/* dwm especifico*/
+	{ MODKEY,                       XK_b,      togglebar,      {0} }, 
+        { MODKEY|Mod1Mask,              XK_l,      setcfact,       {.f = +0.25} }, // Grow stack 
+        { MODKEY|Mod1Mask,              XK_h,      setcfact,       {.f = -0.25} }, // Shrink stack
+        { MODKEY|Mod1Mask,              XK_o,      setcfact,       {.f =  0.00} }, // Reset stack
 
+	/* About gaps */
 	{ MODKEY|Mod1Mask,              XK_u,      incrgaps,       {.i = +1 } },
 	{ MODKEY|Mod1Mask|ShiftMask,    XK_u,      incrgaps,       {.i = -1 } },
 	{ MODKEY|Mod1Mask,              XK_i,      incrigaps,      {.i = +1 } },
@@ -205,10 +208,6 @@ static Key keys[] = {
 	{ MODKEY|Mod1Mask|ShiftMask,    XK_8,      incrohgaps,     {.i = -1 } },
 	{ MODKEY|Mod1Mask,              XK_9,      incrovgaps,     {.i = +1 } },
 	{ MODKEY|Mod1Mask|ShiftMask,    XK_9,      incrovgaps,     {.i = -1 } },
-
-
-
-
 };
 
 /* button definitions */
