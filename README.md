@@ -6,10 +6,10 @@ Welcome to my personal build of dwm! This is my own build of dwm, with many patc
 
 ## Some features of my build are:
 - Configurable transparency for the panel (it needs a compositor)
-- cfacts and drafcfact: This is, change the height of a stack window, with keyboard and mouse!
+- cfacts and drafcfact: change the height of a stack window, with keyboard and mouse!
 - Vanity gaps: Adds gaps, and customize every gap through keybindings.
 - Colorbar: Different colors for every part of the panel.
-- Fake fullscreen: put a window as fullscreen, without actually go to fullscreen!
+- Fake fullscreen: make a window as fullscreen, without actually go to fullscreen!
 - Netclientstacking: This allows some applications to detect the list of windows open. My use case is share screen on Zoom.
 - Various layouts!: not only master and stack. Select between fibbonacci, deck, monocle, dwindle, grid, double deck, centered master and more.
 - Support for dwmblocks, with clickability and colors!
