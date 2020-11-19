@@ -41,6 +41,7 @@ install: all
 	cp -f dwm ~/.local
 	chmod 755 ~/.local/dwm
 	pkill dwm
+	~/.local/dwmblocks &
 
 uninstall:
 	rm -f ${DESTDIR}${PREFIX}/bin/dwm\
