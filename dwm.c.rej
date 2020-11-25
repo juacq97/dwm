@@ -1,32 +1,11 @@
 --- dwm.c
 +++ dwm.c
-@@ -57,6 +58,21 @@
- #define HEIGHT(X)               ((X)->h + 2 * (X)->bw)
- #define TAGMASK                 ((1 << LENGTH(tags)) - 1)
- #define TEXTW(X)                (drw_fontset_getwidth(drw, (X)) + lrpad)
-+#define XRDB_LOAD_COLOR(R,V)    if (XrmGetResource(xrdb, R, NULL, &type, &value) == True) { \
-+                                  if (value.addr != NULL && strnlen(value.addr, 8) == 7 && value.addr[0] == '#') { \
-+                                    int i = 1; \
-+                                    for (; i <= 6; i++) { \
-+                                      if (value.addr[i] < 48) break; \
-+                                      if (value.addr[i] > 57 && value.addr[i] < 65) break; \
-+                                      if (value.addr[i] > 70 && value.addr[i] < 97) break; \
-+                                      if (value.addr[i] > 102) break; \
-+                                    } \
-+                                    if (i == 7) { \
-+                                      strncpy(V, value.addr, 7); \
-+                                      V[7] = '\0'; \
-+                                    } \
-+                                  } \
-+                                }
- 
- /* enums */
- enum { CurNormal, CurResize, CurMove, CurLast }; /* cursor */
-@@ -234,6 +251,7 @@ static Monitor *wintomon(Window w);
- static int xerror(Display *dpy, XErrorEvent *ee);
+@@ -248,6 +262,8 @@ static int xerror(Display *dpy, XErrorEvent *ee);
  static int xerrordummy(Display *dpy, XErrorEvent *ee);
  static int xerrorstart(Display *dpy, XErrorEvent *ee);
-+static void xrdb(const Arg *arg);
  static void zoom(const Arg *arg);
++static void load_xresources(void);
++static void resource_load(XrmDatabase db, char *name, enum resource_type rtype, void *dst);
  
  /* variables */
+ static const char broken[] = "broken";

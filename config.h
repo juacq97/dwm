@@ -24,11 +24,30 @@ static const int topbar             = 1;  /* 0 means bottom bar */
 static const int attachmode         = 2;  /* 0 master (default), 1 = above, 2 = aside, 3 = below, 4 = bottom */
 static const char *fonts[]          = {"Futura Bk BT:Book:size=10", "Material Design Icons:Regular:pixelsize=16:antialias=true"};
 
-#include "colors/horizon.h" //Colorscheme
-static const char spotify[]= "#1FC167"; //Spotify green
+static char back[]   = "#1C1E27";
+static char fore[]   = "#CACACC";
+static char border[] = "#CACACC";
+static char col0[]   = "#6C6F93";
+static char col1[]   = "#E4436F";
+static char col2[]   = "#24E39D";
+static char col3[]   = "#EDA685";
+static char col4[]   = "#00A5AF";
+static char col5[]   = "#B367CF";
+static char col6[]   = "#00A5AF";
+static char col7[]   = "#CACACC";
+static char col8[]   = "#6C6F93";
+static char col9[]   = "#E4436F";
+static char col10[]  = "#24E39D";
+static char col11[]  = "#EDA685";
+static char col12[]  = "#00A5AF";
+static char col13[]  = "#B367CF";
+static char col14[]  = "#00A5AF";
+static char col15[]  = "#CACACC";
+
+static char spotify[]= "#1FC167"; //Spotify green
 
 /* Here is the color array. Check the 'color.h' file to see the names' */
-static const char *colors[][3]      = {
+static char *colors[][3]      = {
 	/*               fg         bg         border           code */
 	[SchemeNorm]     = { fore,      back,      back   }, // \x0b
 	[SchemeSel]      = { fore,      back,      col4   }, // \x0c
@@ -126,6 +145,31 @@ static const Layout layouts[] = {
 	{ MODKEY|ShiftMask,             KEY,      tag,            {.ui = 1 << TAG} }, \
 	{ MODKEY|ControlMask,           KEY,      toggletag,      {.ui = 1 << TAG} },
 
+/*
+ * Xresources preferences to load at startup
+ */
+ResourcePref resources[] = {
+		{ "back",        STRING,  &back },
+		{ "fore",        STRING,  &fore },
+		{ "cursorColor", STRING,  &border },
+		{ "col0",	 STRING,  &col0 },
+		{ "col1",	 STRING,  &col1 },
+		{ "col2",	 STRING,  &col2 },
+		{ "col3",	 STRING,  &col3 },
+		{ "col4",	 STRING,  &col4 },
+		{ "col5",	 STRING,  &col5 },
+		{ "col6",	 STRING,  &col6 },
+		{ "col7",	 STRING,  &col7 },
+		{ "col8",	 STRING,  &col8 },
+		{ "col9",	 STRING,  &col9 },
+		{ "col10",	 STRING,  &col10 },
+		{ "col11",	 STRING,  &col11 },
+		{ "col12",	 STRING,  &col12 },
+		{ "col13",	 STRING,  &col13 },
+		{ "col14",	 STRING,  &col14 },
+		{ "col15",	 STRING,  &col15 },
+};
+
 /* keybindings! Here's only the dwm-related keybindings. To launch apps I use sxhkd */
 #include "movestack.c"
 #include "shiftview.c"
@@ -189,6 +233,7 @@ static Key keys[] = {
         { MODKEY|Mod1Mask,              XK_l,      setcfact,       {.f = +0.25} }, // Grow stack 
         { MODKEY|Mod1Mask,              XK_h,      setcfact,       {.f = -0.25} }, // Shrink stack
         { MODKEY|Mod1Mask,              XK_o,      setcfact,       {.f =  0.00} }, // Reset stack
+	{ MODKEY,                       XK_F8,     xrdb,           {.v = NULL } },
 
 	/* About gaps */
 	{ MODKEY|Mod1Mask,              XK_u,      incrgaps,       {.i = +1 } },
