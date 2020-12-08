@@ -17,3 +17,5 @@ Welcome to my personal build of dwm! This is my own build of dwm, with many patc
 And of course all the features of dwm like tags and a very small footprint.
 
 ![screenshot busy](screenshot2.png)
+
+

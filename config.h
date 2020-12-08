@@ -50,7 +50,7 @@ static char spotify[]= "#1FC167"; //Spotify green
 static char *colors[][3]      = {
 	/*               fg         bg         border           code */
 	[SchemeNorm]     = { fore,      back,      back   }, // \x0b
-	[SchemeSel]      = { fore,      back,      col4   }, // \x0c
+	[SchemeSel]      = { fore,      back,      col1   }, // \x0c
 	[SchemeStatus]   = { fore,      back,      border }, // \x0d
 	[SchemeTagsSel]  = { back,      col6,      border }, // \x0e
         [SchemeTagsNorm] = { fore,      back,      border }, // \x0f
@@ -278,3 +278,21 @@ static Button buttons[] = {
 	{ ClkClientWin,		MODKEY,		Button1,	winview,	{0} },
 };
 
+static const char *ipcsockpath = "/tmp/dwm.sock";
+static IPCCommand ipccommands[] = {
+  IPCCOMMAND(  view,                1,      {ARG_TYPE_UINT}   ),
+  IPCCOMMAND(  toggleview,          1,      {ARG_TYPE_UINT}   ),
+  IPCCOMMAND(  tag,                 1,      {ARG_TYPE_UINT}   ),
+  IPCCOMMAND(  toggletag,           1,      {ARG_TYPE_UINT}   ),
+  IPCCOMMAND(  tagmon,              1,      {ARG_TYPE_UINT}   ),
+  IPCCOMMAND(  focusmon,            1,      {ARG_TYPE_SINT}   ),
+  IPCCOMMAND(  focusstack,          1,      {ARG_TYPE_SINT}   ),
+  IPCCOMMAND(  zoom,                1,      {ARG_TYPE_NONE}   ),
+  IPCCOMMAND(  incnmaster,          1,      {ARG_TYPE_SINT}   ),
+  IPCCOMMAND(  killclient,          1,      {ARG_TYPE_SINT}   ),
+  IPCCOMMAND(  togglefloating,      1,      {ARG_TYPE_NONE}   ),
+  IPCCOMMAND(  setmfact,            1,      {ARG_TYPE_FLOAT}  ),
+  IPCCOMMAND(  setlayoutsafe,       1,      {ARG_TYPE_PTR}    ),
+  IPCCOMMAND(  quit,                1,      {ARG_TYPE_NONE}   ),
+  IPCCOMMAND(  xrdb,		    1,	    {ARG_TYPE_NONE}    )	    
+};

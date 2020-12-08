@@ -6,7 +6,7 @@ include config.mk
 SRC = drw.c dwm.c util.c
 OBJ = ${SRC:.c=.o}
 
-all: options dwm dwm-msg
+all: options dwm
 
 options:
 	@echo dwm build options:
@@ -25,11 +25,8 @@ config.h:
 dwm: ${OBJ}
 	${CC} -o $@ ${OBJ} ${LDFLAGS}
 
-dwm-msg: dwm-msg.o
-	${CC} -o $@ $< ${LDFLAGS}
-
 clean:
-	rm -f dwm dwm-msg ${OBJ} dwm-${VERSION}.tar.gz
+	rm -f dwm ${OBJ} dwm-${VERSION}.tar.gz
 
 dist: clean
 	mkdir -p dwm-${VERSION}
@@ -41,9 +38,8 @@ dist: clean
 
 install: all
 	mkdir -p ~/.local
-	cp -f dwm dwm-msg ~/.local
+	cp -f dwm ~/.local
 	chmod 755 ~/.local/dwm
-	chmod 755 ~/.local/dwm-msg
 	pkill dwm
 	~/.local/dwmblocks &
 
