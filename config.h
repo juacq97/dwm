@@ -52,7 +52,7 @@ static char *colors[][3]      = {
 	[SchemeNorm]     = { fore,      back,      back   }, // \x0b
 	[SchemeSel]      = { fore,      back,      col1   }, // \x0c
 	[SchemeStatus]   = { fore,      back,      border }, // \x0d
-	[SchemeTagsSel]  = { back,      col6,      border }, // \x0e
+	[SchemeTagsSel]  = { back,      col1,    border }, // \x0e
         [SchemeTagsNorm] = { fore,      back,      border }, // \x0f
         [SchemeInfoSel]  = { fore,      back,      border }, // \x10
         [SchemeInfoNorm] = { fore,      back,      border }, // \x11
@@ -71,10 +71,10 @@ static char *colors[][3]      = {
 };
 
 /* Here's the alpha array, needed to have nice transparency */
-static const unsigned int baralpha = 0xd0; //The alpha channel
+static const unsigned int baralpha = 255; //The alpha channel
 static const unsigned int borderalpha = OPAQUE; // The border alpha channel
 static const unsigned int alphas[][3]      = {
-	/*               fg      bg        border     */
+	/*               fg            bg        border     */
     [SchemeNorm]     = { OPAQUE,    baralpha,   borderalpha },
     [SchemeSel]      = { OPAQUE,    baralpha,   borderalpha },
     [SchemeStatus]   = { OPAQUE,    baralpha,   borderalpha },
