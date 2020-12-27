@@ -11,8 +11,8 @@
 /* appearance */
 static const unsigned int borderpx  = 2;       
 static const unsigned int snap      = 6;      
-static const unsigned int gappih    = 8;      
-static const unsigned int gappiv    = 8;      
+static const unsigned int gappih    = 10;      
+static const unsigned int gappiv    = 10;      
 static const unsigned int gappoh    = 6;      
 static const unsigned int gappov    = 6;      
 static       int smartgaps          = 0;  /* 1 means no gap with one window */
@@ -121,6 +121,7 @@ static const Rule rules[] = {
 /* layout(s) */
 static const float mfact     = 0.5; /* factor of master area */
 static const int nmaster     = 1;    /* clients in master */
+static const int nstack      = 0;    /* number of clients in primary stack area */
 static const int resizehints = 0;    /* 1 means respect size hints */
 
 #define FORCE_VSPLIT 1  /* nrowgrid layout: force two clients to always split vertically */
@@ -128,13 +129,29 @@ static const int resizehints = 0;    /* 1 means respect size hints */
 
 /* Here's the layouts. The count starts with zero */
 static const Layout layouts[] = {
-	/* symbol     arrange function */
+/*	 symbol     arrange function 
 	{ "󰙀",           tile }, 
 	{ "󱒅",           centeredmaster },
 	{ "󰋁",           gaplessgrid },
 	{ "[M]",         monocle },
 	{ "[D]",         deck },
-	{ NULL,          NULL },
+	{ NULL,          NULL }, */
+
+	/* symbol     arrange function, { nmaster, nstack, layout, master axis, stack axis, secondary stack axis } */
+	{ "󰙀",      flextile,         { -1, -1, SPLIT_VERTICAL, TOP_TO_BOTTOM, TOP_TO_BOTTOM, 0, NULL } }, // default tile layout
+	{ "󱒅",      flextile,         { -1, -1, SPLIT_HORIZONTAL, LEFT_TO_RIGHT, TOP_TO_BOTTOM, 0, monoclesymbols } }, // centeredmaster
+	{ "󰋁",      flextile,         { -1, -1, NO_SPLIT, GAPPLESSGRID, 0, 0, NULL } }, // gappless grid
+	{ "[M]",      flextile,         { -1, -1, NO_SPLIT, MONOCLE, 0, 0, NULL } }, // monocle
+	{ "[D]",      flextile,         { -1, -1, SPLIT_VERTICAL, TOP_TO_BOTTOM, MONOCLE, 0, NULL } }, // deck
+	{ NULL,       NULL,             {0} },
+};
+
+static const Layout doublestack[] = {
+	{ "|[D][D]",      flextile,         { -1, -1, SPLIT_VERTICAL_DUAL_STACK, TOP_TO_BOTTOM, MONOCLE, MONOCLE, NULL } }, // 2 stacks, both monocle
+	{ "|[|][|]",      flextile,         { -1, -1, SPLIT_VERTICAL_DUAL_STACK, TOP_TO_BOTTOM, LEFT_TO_RIGHT, LEFT_TO_RIGHT, NULL } }, // two stack, both horizontal
+	{ "|[D][|]",      flextile,         { -1, -1, SPLIT_VERTICAL_DUAL_STACK, TOP_TO_BOTTOM, MONOCLE, LEFT_TO_RIGHT, NULL } }, // two stack, monocle and horizontal
+	{ "|[|][D]",      flextile,         { -1, -1, SPLIT_VERTICAL_DUAL_STACK, TOP_TO_BOTTOM, LEFT_TO_RIGHT, MONOCLE, NULL } }, // two stack, horizontal and monocle
+
 };
 
 /* key definitions */
@@ -211,9 +228,14 @@ static Key keys[] = {
 	TAGKEYS(                        XK_9,                      8) /*Activate tag 9*/
 
 	/*About layouts*/
-	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} }, /*tiled*/
-	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[3]} }, /*monocle*/
-	{ MODKEY|ShiftMask,             XK_m,      setlayout,      {.v = &layouts[4]} }, /*Deck*/
+	{ MODKEY|Mod1Mask,             XK_q,      setlayout,    {.v = &doublestack[0]} }, /*Deck*/
+	{ MODKEY|Mod1Mask,           XK_w,      setlayout,      {.v = &doublestack[1]} }, /*tiled*/
+	{ MODKEY|Mod1Mask,           XK_e,      setlayout,      {.v = &doublestack[2]} }, /*tiled*/
+	{ MODKEY|Mod1Mask,           XK_r,      setlayout,      {.v = &doublestack[3]} }, /*tiled*/
+
+
+
+	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} }, // Grid for all tags
 	{ MODKEY,                       XK_s,      togglefloating, {0} }, 
 	{ MODKEY,			XK_F11,    togglefullscreen,  {0} }, 
 	{ MODKEY|ShiftMask,	     	XK_F11,    togglefakefullscreen,  {0} }, // Fullscreen on the tile
@@ -256,9 +278,20 @@ static Key keys[] = {
 	{ MODKEY,	                XK_z,      scratchpad_show, {0} },
 	{ MODKEY|Mod1Mask,           XK_z,      scratchpad_hide, {0} },
 	{ MODKEY|ControlMask,	        XK_z,      scratchpad_remove,{0} },
+
+	{ MODKEY|ControlMask,           XK_i,      incnstack,      {.i = +1 } },
+	{ MODKEY|ControlMask,           XK_o,      incnstack,      {.i = -1 } },
+
+	{ MODKEY|ControlMask,           XK_q,      rotatelayoutaxis, {.i = +1 } },  /* flextile, 1 = layout axis */
+	{ MODKEY|ControlMask,           XK_w,      rotatelayoutaxis, {.i = +2 } },  /* flextile, 2 = master axis */
+	{ MODKEY|ControlMask,           XK_e,      rotatelayoutaxis, {.i = +3 } },  /* flextile, 3 = stack axis */
+	{ MODKEY|ControlMask,           XK_r,      rotatelayoutaxis, {.i = +4 } },  /* flextile, 4 = secondary stack axis */
+	{ MODKEY|ControlMask|ShiftMask, XK_q,      rotatelayoutaxis, {.i = -1 } },  /* flextile, 1 = layout axis */
+	{ MODKEY|ControlMask|ShiftMask, XK_w,      rotatelayoutaxis, {.i = -2 } },  /* flextile, 2 = master axis */
+	{ MODKEY|ControlMask|ShiftMask, XK_e,      rotatelayoutaxis, {.i = -3 } },  /* flextile, 3 = stack axis */
+	{ MODKEY|ControlMask|ShiftMask, XK_e,      rotatelayoutaxis, {.i = -4 } },  /* flextile, 4 = secondary stack axis */
+	{ MODKEY,			XK_bar, mirrorlayout,   {0} },           /* flextile, flip master and stack areas */
 };
-
-
 
 /* button definitions */
 /* click can be ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle, ClkClientWin, or ClkRootWin */
