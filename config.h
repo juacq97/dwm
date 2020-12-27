@@ -253,6 +253,9 @@ static Key keys[] = {
 	{ MODKEY|Mod1Mask|ShiftMask,    XK_8,      incrohgaps,     {.i = -1 } },
 	{ MODKEY|Mod1Mask,              XK_9,      incrovgaps,     {.i = +1 } },
 	{ MODKEY|Mod1Mask|ShiftMask,    XK_9,      incrovgaps,     {.i = -1 } },
+	{ MODKEY,	                XK_z,      scratchpad_show, {0} },
+	{ MODKEY|Mod1Mask,           XK_z,      scratchpad_hide, {0} },
+	{ MODKEY|ControlMask,	        XK_z,      scratchpad_remove,{0} },
 };
 
 
