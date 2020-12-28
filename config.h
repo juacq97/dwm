@@ -9,7 +9,7 @@
 */
 
 /* appearance */
-static const unsigned int borderpx  = 2;       
+static const unsigned int borderpx  = 3;       
 static const unsigned int snap      = 6;      
 static const unsigned int gappih    = 10;      
 static const unsigned int gappiv    = 10;      
@@ -139,9 +139,9 @@ static const Layout layouts[] = {
 
 	/* symbol     arrange function, { nmaster, nstack, layout, master axis, stack axis, secondary stack axis } */
 	{ "󰙀",      flextile,         { -1, -1, SPLIT_VERTICAL, TOP_TO_BOTTOM, TOP_TO_BOTTOM, 0, NULL } }, // default tile layout
-	{ "󱒅",      flextile,         { -1, -1, SPLIT_HORIZONTAL, LEFT_TO_RIGHT, TOP_TO_BOTTOM, 0, monoclesymbols } }, // centeredmaster
+	{ "󱒅",      flextile,         { -1, -1, SPLIT_CENTERED_VERTICAL, TOP_TO_BOTTOM, TOP_TO_BOTTOM, 0, NULL } }, // centeredmaster
 	{ "󰋁",      flextile,         { -1, -1, NO_SPLIT, GAPPLESSGRID, 0, 0, NULL } }, // gappless grid
-	{ "[M]",      flextile,         { -1, -1, NO_SPLIT, MONOCLE, 0, 0, NULL } }, // monocle
+	{ "[M]",      flextile,         { -1, -1, NO_SPLIT, MONOCLE, 0, 0, monoclesymbols } }, // monocle
 	{ "[D]",      flextile,         { -1, -1, SPLIT_VERTICAL, TOP_TO_BOTTOM, MONOCLE, 0, NULL } }, // deck
 	{ NULL,       NULL,             {0} },
 };
