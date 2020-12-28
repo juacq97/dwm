@@ -50,9 +50,9 @@ static char spotify[]= "#1FC167"; //Spotify green
 static char *colors[][3]      = {
 	/*               fg         bg         border           code */
 	[SchemeNorm]     = { fore,      back,      back   }, // \x0b
-	[SchemeSel]      = { fore,      back,      col1   }, // \x0c
+	[SchemeSel]      = { fore,      back,      border   }, // \x0c
 	[SchemeStatus]   = { fore,      back,      border }, // \x0d
-	[SchemeTagsSel]  = { back,      col1,    border }, // \x0e
+	[SchemeTagsSel]  = { back,      border,    border }, // \x0e
         [SchemeTagsNorm] = { fore,      back,      border }, // \x0f
         [SchemeInfoSel]  = { fore,      back,      border }, // \x10
         [SchemeInfoNorm] = { fore,      back,      border }, // \x11
@@ -228,14 +228,16 @@ static Key keys[] = {
 	TAGKEYS(                        XK_9,                      8) /*Activate tag 9*/
 
 	/*About layouts*/
-	{ MODKEY|Mod1Mask,             XK_q,      setlayout,    {.v = &doublestack[0]} }, /*Deck*/
-	{ MODKEY|Mod1Mask,           XK_w,      setlayout,      {.v = &doublestack[1]} }, /*tiled*/
-	{ MODKEY|Mod1Mask,           XK_e,      setlayout,      {.v = &doublestack[2]} }, /*tiled*/
-	{ MODKEY|Mod1Mask,           XK_r,      setlayout,      {.v = &doublestack[3]} }, /*tiled*/
+	{ MODKEY,             XK_u,      setlayout,    {.v = &doublestack[0]} }, /*Deck*/
+	{ MODKEY,           XK_i,      setlayout,      {.v = &doublestack[1]} }, /*tiled*/
+	{ MODKEY,           XK_o,      setlayout,      {.v = &doublestack[2]} }, /*tiled*/
+	{ MODKEY,           XK_p,      setlayout,      {.v = &doublestack[3]} }, /*tiled*/
 
 
 
 	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} }, // Grid for all tags
+	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[3]} }, // Grid for all tags
+	{ MODKEY|ShiftMask,                       XK_m,      setlayout,      {.v = &layouts[4]} }, // Grid for all tags
 	{ MODKEY,                       XK_s,      togglefloating, {0} }, 
 	{ MODKEY,			XK_F11,    togglefullscreen,  {0} }, 
 	{ MODKEY|ShiftMask,	     	XK_F11,    togglefakefullscreen,  {0} }, // Fullscreen on the tile

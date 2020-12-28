@@ -130,8 +130,21 @@ typedef struct {
 } Key;
 
 typedef struct {
+	int nmaster;
+	int nstack;
+	int layout;
+	int masteraxis; // master stack area
+	int stack1axis; // primary stack area
+	int stack2axis; // secondary stack area, e.g. centered master
+	void (*symbolfunc)(Monitor *, unsigned int);
+} LayoutPreset;
+
+
+
+typedef struct {
 	const char *symbol;
 	void (*arrange)(Monitor *);
+	LayoutPreset preset;
 } Layout;
 
 typedef struct Pertag Pertag;
@@ -139,6 +152,8 @@ struct Monitor {
 	char ltsymbol[16];
 	char lastltsymbol[16];
 	float mfact;
+	int ltaxis[4];
+	int nstack;
 	int nmaster;
 	int num;
 	int by;               /* bar geometry */
@@ -235,7 +250,6 @@ static void killclient(const Arg *arg);
 static void manage(Window w, XWindowAttributes *wa);
 static void mappingnotify(XEvent *e);
 static void maprequest(XEvent *e);
-static void monocle(Monitor *m);
 static void motionnotify(XEvent *e);
 static void movemouse(const Arg *arg);
 static Client *nexttiled(Client *c);
@@ -310,6 +324,8 @@ static void resource_load(XrmDatabase db, char *name, enum resource_type rtype, 
 static void centeredmaster(Monitor *m);
 static void centeredfloatingmaster(Monitor *m);
 
+#include "flextile-deluxe.h"
+
 /* variables */
 static const char broken[] = "broken";
 static char stextc[256];
@@ -374,9 +390,14 @@ struct Pertag {
 	int nmasters[LENGTH(tags) + 1]; /* number of windows in master area */
 	float mfacts[LENGTH(tags) + 1]; /* mfacts per tag */
 	unsigned int sellts[LENGTH(tags) + 1]; /* selected layouts */
-	const Layout *ltidxs[LENGTH(tags) + 1][2]; /* matrix of tags and layouts indexes  */
-	int showbars[LENGTH(tags) + 1]; /* display bar for the current tag */
+	int nstacks[LENGTH(tags) + 1]; /* number of windows in primary stack area */
+	int ltaxis[LENGTH(tags) + 1][LTAXIS_LAST];
+	const Layout *ltidxs[LENGTH(tags) + 1][3]; /* matrix of tags and layouts indexes  */
+	Bool showbars[LENGTH(tags) + 1]; /* display bar for the current tag */
+	Client *prevzooms[LENGTH(tags) + 1]; /* store zoom information */
 };
+
+#include "flextile-deluxe.c"
 
 /* compile-time check if all tags fit into an unsigned int bit array. */
 struct NumTags { char limitexceeded[LENGTH(tags) > 30 ? -1 : 1]; };
@@ -806,12 +827,13 @@ Monitor *
 createmon(void)
 {
 	Monitor *m;
-	unsigned int i;
+	int i;
 
 	m = ecalloc(1, sizeof(Monitor));
 	m->tagset[0] = m->tagset[1] = 1;
 	m->mfact = mfact;
 	m->nmaster = nmaster;
+	m->nstack = nstack;
 	m->showbar = showbar;
 	m->topbar = topbar;
 	m->gappih = gappih;
@@ -824,15 +846,37 @@ createmon(void)
 	m->pertag = ecalloc(1, sizeof(Pertag));
 	m->pertag->curtag = m->pertag->prevtag = 1;
 
+	m->ltaxis[LAYOUT] = m->lt[0]->preset.layout;
+	m->ltaxis[MASTER] = m->lt[0]->preset.masteraxis;
+	m->ltaxis[STACK]  = m->lt[0]->preset.stack1axis;
+	m->ltaxis[STACK2] = m->lt[0]->preset.stack2axis;
+
+	if (!(m->pertag = (Pertag *)calloc(1, sizeof(Pertag))))
+		die("fatal: could not malloc() %u bytes\n", sizeof(Pertag));
+	m->pertag->curtag = m->pertag->prevtag = 1;
 	for (i = 0; i <= LENGTH(tags); i++) {
+		/* init nmaster */
 		m->pertag->nmasters[i] = m->nmaster;
+		m->pertag->nstacks[i] = m->nstack;
+
+		/* init mfacts */
 		m->pertag->mfacts[i] = m->mfact;
 
+		/* init layouts */
 		m->pertag->ltidxs[i][0] = m->lt[0];
 		m->pertag->ltidxs[i][1] = m->lt[1];
 		m->pertag->sellts[i] = m->sellt;
 
+		m->pertag->ltaxis[i][LAYOUT] = m->ltaxis[LAYOUT];
+		m->pertag->ltaxis[i][MASTER] = m->ltaxis[MASTER];
+		m->pertag->ltaxis[i][STACK]  = m->ltaxis[STACK];
+		m->pertag->ltaxis[i][STACK2] = m->ltaxis[STACK2];
+
+		/* init showbar */
 		m->pertag->showbars[i] = m->showbar;
+
+		/* swap focus and zoomswap*/
+		m->pertag->prevzooms[i] = NULL;
 	}
 
 	return m;
@@ -1594,21 +1638,6 @@ maprequest(XEvent *e)
 }
 
 void
-monocle(Monitor *m)
-{
-	unsigned int n = 0;
-	Client *c;
-
-	for (c = m->clients; c; c = c->next)
-		if (ISVISIBLE(c))
-			n++;
-	if (n > 0) /* override layout symbol */
-		snprintf(m->ltsymbol, sizeof m->ltsymbol, "[%d]", n);
-	for (c = nexttiled(m->clients); c; c = nexttiled(c->next))
-		resize(c, m->wx, m->wy, m->ww - 2 * c->bw, m->wh - 2 * c->bw, 0);
-}
-
-void
 motionnotify(XEvent *e)
 {
 	static Monitor *mon = NULL;
@@ -2216,10 +2245,31 @@ setfullscreen(Client *c, int fullscreen)
 void
 setlayout(const Arg *arg)
 {
-	if (!arg || !arg->v || arg->v != selmon->lt[selmon->sellt])
-		selmon->sellt = selmon->pertag->sellts[selmon->pertag->curtag] ^= 1;
+	if (!arg || !arg->v || arg->v != selmon->lt[selmon->sellt]) {
+		selmon->pertag->sellts[selmon->pertag->curtag] ^= 1;
+		selmon->sellt = selmon->pertag->sellts[selmon->pertag->curtag];
+	}
+
 	if (arg && arg->v)
-		selmon->lt[selmon->sellt] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt] = (Layout *)arg->v;
+
+		selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt] = (Layout *)arg->v;
+	selmon->lt[selmon->sellt] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt];
+
+	if (selmon->lt[selmon->sellt]->preset.nmaster && selmon->lt[selmon->sellt]->preset.nmaster != -1)
+		selmon->nmaster = selmon->lt[selmon->sellt]->preset.nmaster;
+	if (selmon->lt[selmon->sellt]->preset.nstack && selmon->lt[selmon->sellt]->preset.nstack != -1)
+		selmon->nstack = selmon->lt[selmon->sellt]->preset.nstack;
+
+	selmon->ltaxis[LAYOUT] = selmon->lt[selmon->sellt]->preset.layout;
+	selmon->ltaxis[MASTER] = selmon->lt[selmon->sellt]->preset.masteraxis;
+	selmon->ltaxis[STACK]  = selmon->lt[selmon->sellt]->preset.stack1axis;
+	selmon->ltaxis[STACK2] = selmon->lt[selmon->sellt]->preset.stack2axis;
+
+	selmon->pertag->ltaxis[selmon->pertag->curtag][LAYOUT] = selmon->ltaxis[LAYOUT];
+	selmon->pertag->ltaxis[selmon->pertag->curtag][MASTER] = selmon->ltaxis[MASTER];
+	selmon->pertag->ltaxis[selmon->pertag->curtag][STACK]  = selmon->ltaxis[STACK];
+	selmon->pertag->ltaxis[selmon->pertag->curtag][STACK2] = selmon->ltaxis[STACK2];
+
 	strncpy(selmon->ltsymbol, selmon->lt[selmon->sellt]->symbol, sizeof selmon->ltsymbol);
 	if (selmon->sel)
 		arrange(selmon);
@@ -2579,19 +2629,17 @@ toggleview(const Arg *arg)
 	int i;
 
 	if (newtagset) {
-		selmon->tagset[selmon->seltags] = newtagset;
-
 		if (newtagset == ~0) {
 			selmon->pertag->prevtag = selmon->pertag->curtag;
 			selmon->pertag->curtag = 0;
 		}
-
 		/* test if the user did not select the same tag */
 		if (!(newtagset & 1 << (selmon->pertag->curtag - 1))) {
 			selmon->pertag->prevtag = selmon->pertag->curtag;
-			for (i = 0; !(newtagset & 1 << i); i++) ;
+			for (i=0; !(newtagset & 1 << i); i++) ;
 			selmon->pertag->curtag = i + 1;
 		}
+		selmon->tagset[selmon->seltags] = newtagset;
 
 		/* apply settings for this view */
 		selmon->nmaster = selmon->pertag->nmasters[selmon->pertag->curtag];
@@ -2599,7 +2647,6 @@ toggleview(const Arg *arg)
 		selmon->sellt = selmon->pertag->sellts[selmon->pertag->curtag];
 		selmon->lt[selmon->sellt] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt];
 		selmon->lt[selmon->sellt^1] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt^1];
-
 		if (selmon->showbar != selmon->pertag->showbars[selmon->pertag->curtag])
 			togglebar(NULL);
 
@@ -2979,14 +3026,14 @@ view(const Arg *arg)
 	if ((arg->ui & TAGMASK) == selmon->tagset[selmon->seltags])
 		return;
 	selmon->seltags ^= 1; /* toggle sel tagset */
-	if (arg->ui & TAGMASK) {
-		selmon->tagset[selmon->seltags] = arg->ui & TAGMASK;
-		selmon->pertag->prevtag = selmon->pertag->curtag;
 
+	if (arg->ui & TAGMASK) {
+		selmon->pertag->prevtag = selmon->pertag->curtag;
+		selmon->tagset[selmon->seltags] = arg->ui & TAGMASK;
 		if (arg->ui == ~0)
 			selmon->pertag->curtag = 0;
 		else {
-			for (i = 0; !(arg->ui & 1 << i); i++) ;
+			for (i=0; !(arg->ui & 1 << i); i++) ;
 			selmon->pertag->curtag = i + 1;
 		}
 	} else {
@@ -2994,13 +3041,16 @@ view(const Arg *arg)
 		selmon->pertag->prevtag = selmon->pertag->curtag;
 		selmon->pertag->curtag = tmptag;
 	}
-
 	selmon->nmaster = selmon->pertag->nmasters[selmon->pertag->curtag];
+	selmon->nstack = selmon->pertag->nstacks[selmon->pertag->curtag];
 	selmon->mfact = selmon->pertag->mfacts[selmon->pertag->curtag];
 	selmon->sellt = selmon->pertag->sellts[selmon->pertag->curtag];
 	selmon->lt[selmon->sellt] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt];
 	selmon->lt[selmon->sellt^1] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt^1];
-
+	selmon->ltaxis[LAYOUT] = selmon->pertag->ltaxis[selmon->pertag->curtag][LAYOUT];
+	selmon->ltaxis[MASTER] = selmon->pertag->ltaxis[selmon->pertag->curtag][MASTER];
+	selmon->ltaxis[STACK]  = selmon->pertag->ltaxis[selmon->pertag->curtag][STACK];
+	selmon->ltaxis[STACK2] = selmon->pertag->ltaxis[selmon->pertag->curtag][STACK2];
 	if (selmon->showbar != selmon->pertag->showbars[selmon->pertag->curtag])
 		togglebar(NULL);
 
