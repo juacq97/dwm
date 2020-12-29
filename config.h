@@ -1,4 +1,3 @@
-
 /*                          __ _         _     
 *           ___ ___  _ __  / _(_) __ _  | |__  
 *          / __/ _ \| '_ \| |_| |/ _` | | '_ \ 
@@ -22,7 +21,7 @@ static int floatposgrid_x           = 5;
 static int floatposgrid_y           = 5;  
 static const int topbar             = 1;  /* 0 means bottom bar */
 static const int attachmode         = 2;  /* 0 master (default), 1 = above, 2 = aside, 3 = below, 4 = bottom */
-static const char *fonts[]          = {"Futura Bk BT:Book:size=10", "Material Design Icons:Regular:pixelsize=16:antialias=true"};
+static const char *fonts[]          = {"Futura Bk BT:Book:size=10", "Material Design Icons:Regular:pixelsize=14:antialias=true"};
 
 static char back[]   = "#1C1E27";
 static char fore[]   = "#CACACC";
@@ -52,7 +51,7 @@ static char *colors[][3]      = {
 	[SchemeNorm]     = { fore,      back,      back   }, // \x0b
 	[SchemeSel]      = { fore,      back,      border   }, // \x0c
 	[SchemeStatus]   = { fore,      back,      border }, // \x0d
-	[SchemeTagsSel]  = { back,      border,    border }, // \x0e
+	[SchemeTagsSel]  = { border,      back,    border }, // \x0e
         [SchemeTagsNorm] = { fore,      back,      border }, // \x0f
         [SchemeInfoSel]  = { fore,      back,      border }, // \x10
         [SchemeInfoNorm] = { fore,      back,      border }, // \x11
@@ -97,7 +96,8 @@ static const unsigned int alphas[][3]      = {
 };
 
 /* tagging */
-static const char *tags[] = { "1", "2", "3", "4", "5", "6" };
+static const char *tags[] = { "󰑊", "󰑊", "󰑊", "󰑊", "󰑊", "󰑊" };
+static const char *alttags[] = { "󰻂", "󰻂", "󰻂", "󰻂", "󰻂", "󰻂" };
 
 static const Rule rules[] = {
 	/* xprop(1):

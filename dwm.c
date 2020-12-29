@@ -598,7 +598,7 @@ void
 buttonpress(XEvent *e)
 {
 	int i, x;
-        unsigned int click;
+        unsigned int click, occ;
 	Arg arg = {0};
 	Client *c;
 	Monitor *m;
@@ -613,9 +613,14 @@ buttonpress(XEvent *e)
 	if (ev->window == selmon->barwin) {
                 if (ev->x < ble) {
                         if (ev->x < ble - blw) {
-                                i = -1, x = -ev->x;
+                                i = -1, x = occ = -ev->x;
+		    /* Bitmask of occupied tags */
+
+		    for (c = m->clients; c; c = c->next)
+		    	occ |= c->tags;
+
                                 do
-                                        x += TEXTW(tags[++i]);
+                                        x += TEXTW(occ & 1 << i ? alttags[++i] : tags[++i]);
                                 while (x <= 0);
                                 click = ClkTagBar;
                                 arg.ui = 1 << i;
@@ -1028,6 +1033,7 @@ drawbar(Monitor *m)
 	int boxs = drw->fonts->h / 9;
 	int boxw = drw->fonts->h / 6 + 2;
 	unsigned int i, occ = 0, urg = 0;
+	const char *tagtext;
 	Client *c;
 
 	/* draw status first so it can be overdrawn by tags later */
@@ -1065,13 +1071,17 @@ drawbar(Monitor *m)
 	}
 	x = 0;
 	for (i = 0; i < LENGTH(tags); i++) {
-		w = TEXTW(tags[i]);
-		drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeTagsSel : SchemeTagsNorm]);
-		drw_text(drw, x, 0, w, bh, lrpad / 2, tags[i], urg & 1 << i);
+		tagtext = occ & 1 << i ? alttags[i] : tags[i];
+		w = TEXTW(tagtext);
+ 		drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeTagsSel : SchemeTagsNorm]);
+		drw_text(drw, x, 0, w, bh, lrpad / 2, tagtext, urg & 1 << i);
+
+		/* Uncomment this if you want the little box over tags
 		if (occ & 1 << i)
 			drw_rect(drw, x + boxs, boxs, boxw, boxw,
 				m == selmon && selmon->sel && selmon->sel->tags & 1 << i,
-				urg & 1 << i);
+				urg & 1 << i); 
+				*/
 		x += w;
 	}
 	w = TEXTW(m->ltsymbol);

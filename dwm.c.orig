@@ -225,12 +225,11 @@ static void destroynotify(XEvent *e);
 static void detach(Client *c);
 static void detachstack(Client *c);
 static Monitor *dirtomon(int dir);
-static void doubledeck(Monitor *m);
 static void dragcfact(const Arg *arg);
 static void drawbar(Monitor *m);
 static void drawbars(void);
 static void expose(XEvent *e);
-static void floatpos(const Arg *arg);
+//static void floatpos(const Arg *arg);
 static void focus(Client *c);
 static void focusin(XEvent *e);
 static void focusmon(const Arg *arg);
@@ -285,7 +284,7 @@ static void seturgent(Client *c, int urg);
 static void showhide(Client *c);
 static void sigchld(int unused);
 static void sigdwmblocks(const Arg *arg);
-static void spawn(const Arg *arg);
+//static void spawn(const Arg *arg);
 static void switchcol(const Arg *arg);
 static void tag(const Arg *arg);
 static void tagmon(const Arg *arg);
@@ -321,8 +320,8 @@ static void zoom(const Arg *arg);
 static void xrdb(const Arg *arg);
 static void load_xresources(void);
 static void resource_load(XrmDatabase db, char *name, enum resource_type rtype, void *dst);
-static void centeredmaster(Monitor *m);
-static void centeredfloatingmaster(Monitor *m);
+//static void centeredmaster(Monitor *m);
+//static void centeredfloatingmaster(Monitor *m);
 
 #include "flextile-deluxe.h"
 
@@ -1023,27 +1022,6 @@ dragcfact(const Arg *arg)
 }
 
 void
-doubledeck(Monitor *m) {
-	unsigned int i, n, mw;
-	Client *c;
-
-	for(n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
-	if(n == 0)
-		return;
-
-	if(n > m->nmaster)
-		mw = m->nmaster ? m->ww * m->mfact : 0;
-	else
-		mw = m->ww;
-
-	for(i = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
-		if(i < m->nmaster)
-			resize(c, m->wx, m->wy, mw - (2*c->bw), m->wh - (2*c->bw), False);
-		else
-			resize(c, m->wx + mw, m->wy, m->ww - mw - (2*c->bw), m->wh - (2*c->bw), False);
-}
-
-void
 drawbar(Monitor *m)
 {
 	int x, w;
@@ -1158,7 +1136,7 @@ expose(XEvent *e)
 		drawbar(m);
 }
 
-void
+/*void
 floatpos(const Arg *arg)
 {
 	Client *c = selmon->sel;
@@ -1171,7 +1149,7 @@ floatpos(const Arg *arg)
 
 	XRaiseWindow(dpy, c->win);
 	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w/2, c->h/2);
-}
+} */
 
 void
 focus(Client *c)
@@ -1642,7 +1620,6 @@ motionnotify(XEvent *e)
 {
 	static Monitor *mon = NULL;
 	Monitor *m;
-	Client *sel;
 	XMotionEvent *ev = &e->xmotion;
 
         if (ev->window == root) {
