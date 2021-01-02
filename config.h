@@ -16,6 +16,7 @@ static const unsigned int gappoh    = 6;
 static const unsigned int gappov    = 6;      
 static       int smartgaps          = 0;  /* 1 means no gap with one window */
 static const int user_bh            = 25; /* 0 means height equal to font size */
+static const int user_tp            = 5;  /* 0 means default tag padding */
 static const int showbar            = 1;  /* 0 means no bar */
 static int floatposgrid_x           = 5;  
 static int floatposgrid_y           = 5;  
@@ -190,6 +191,7 @@ ResourcePref resources[] = {
 /* keybindings! Here's only the dwm-related keybindings. To launch apps I use sxhkd */
 #include "movestack.c"
 #include "shiftview.c"
+#include "inplacerotate.c"
 static Key keys[] = {
 	/* modifier                     key        function        argument */
 
@@ -223,16 +225,13 @@ static Key keys[] = {
 	TAGKEYS(                        XK_4,                      3) /*Activate tag 4*/
 	TAGKEYS(                        XK_5,                      4) /*Activate tag 5*/
 	TAGKEYS(                        XK_6,                      5) /*Activate tag 6*/
-	TAGKEYS(                        XK_7,                      6) /*Activate tag 7*/
-	TAGKEYS(                        XK_8,                      7) /*Activate tag 8*/
-	TAGKEYS(                        XK_9,                      8) /*Activate tag 9*/
 
 	/*About layouts*/
-	{ MODKEY,             XK_u,      setlayout,    {.v = &doublestack[0]} }, /*Deck*/
-	{ MODKEY,           XK_i,      setlayout,      {.v = &doublestack[1]} }, /*tiled*/
-	{ MODKEY,           XK_o,      setlayout,      {.v = &doublestack[2]} }, /*tiled*/
-	{ MODKEY,           XK_p,      setlayout,      {.v = &doublestack[3]} }, /*tiled*/
-
+	{ MODKEY|ControlMask,		 XK_m,      setlayout,      {.v = &doublestack[0]} }, /*double deck*/
+	{ MODKEY|ControlMask,            XK_i,      setlayout,      {.v = &doublestack[2]} }, /*up decked*/
+	{ MODKEY|ControlMask,            XK_u,      setlayout,      {.v = &doublestack[3]} }, /*down decked*/
+	{ MODKEY|ControlMask,            XK_o,      setlayout,      {.v = &doublestack[1]} }, /*stack grid*/
+                  
 
 
 	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} }, // Grid for all tags
@@ -262,21 +261,21 @@ static Key keys[] = {
 	/* About gaps */
 	{ MODKEY|Mod1Mask,              XK_u,      incrgaps,       {.i = +1 } },
 	{ MODKEY|Mod1Mask|ShiftMask,    XK_u,      incrgaps,       {.i = -1 } },
-	{ MODKEY|Mod1Mask,              XK_i,      incrigaps,      {.i = +1 } },
-	{ MODKEY|Mod1Mask|ShiftMask,    XK_i,      incrigaps,      {.i = -1 } },
-	{ MODKEY|Mod1Mask,              XK_o,      incrogaps,      {.i = +1 } },
-	{ MODKEY|Mod1Mask|ShiftMask,    XK_o,      incrogaps,      {.i = -1 } },
+	//{ MODKEY|Mod1Mask,              XK_i,      incrigaps,      {.i = +1 } },
+	//{ MODKEY|Mod1Mask|ShiftMask,    XK_i,      incrigaps,      {.i = -1 } },
+	//{ MODKEY|Mod1Mask,              XK_o,      incrogaps,      {.i = +1 } },
+	//{ MODKEY|Mod1Mask|ShiftMask,    XK_o,      incrogaps,      {.i = -1 } },
 	{ MODKEY|Mod1Mask,              XK_0,      togglegaps,     {0} },
 	{ MODKEY|Mod1Mask|ShiftMask,    XK_0,      defaultgaps,    {0} },
 
-	{ MODKEY|Mod1Mask,              XK_6,      incrihgaps,     {.i = +1 } },
-	{ MODKEY|Mod1Mask|ShiftMask,    XK_6,      incrihgaps,     {.i = -1 } },
-	{ MODKEY|Mod1Mask,              XK_7,      incrivgaps,     {.i = +1 } },
-	{ MODKEY|Mod1Mask|ShiftMask,    XK_7,      incrivgaps,     {.i = -1 } },
-	{ MODKEY|Mod1Mask,              XK_8,      incrohgaps,     {.i = +1 } },
-	{ MODKEY|Mod1Mask|ShiftMask,    XK_8,      incrohgaps,     {.i = -1 } },
-	{ MODKEY|Mod1Mask,              XK_9,      incrovgaps,     {.i = +1 } },
-	{ MODKEY|Mod1Mask|ShiftMask,    XK_9,      incrovgaps,     {.i = -1 } },
+	//{ MODKEY|Mod1Mask,              XK_6,      incrihgaps,     {.i = +1 } },
+	//{ MODKEY|Mod1Mask|ShiftMask,    XK_6,      incrihgaps,     {.i = -1 } },
+	//{ MODKEY|Mod1Mask,              XK_7,      incrivgaps,     {.i = +1 } },
+	//{ MODKEY|Mod1Mask|ShiftMask,    XK_7,      incrivgaps,     {.i = -1 } },
+	//{ MODKEY|Mod1Mask,              XK_8,      incrohgaps,     {.i = +1 } },
+	//{ MODKEY|Mod1Mask|ShiftMask,    XK_8,      incrohgaps,     {.i = -1 } },
+	//{ MODKEY|Mod1Mask,              XK_9,      incrovgaps,     {.i = +1 } },
+	//{ MODKEY|Mod1Mask|ShiftMask,    XK_9,      incrovgaps,     {.i = -1 } },
 	{ MODKEY,	                XK_z,      scratchpad_show, {0} },
 	{ MODKEY|Mod1Mask,           XK_z,      scratchpad_hide, {0} },
 	{ MODKEY|ControlMask,	        XK_z,      scratchpad_remove,{0} },
@@ -285,13 +284,13 @@ static Key keys[] = {
 	{ MODKEY|ControlMask,           XK_o,      incnstack,      {.i = -1 } },
 
 	{ MODKEY|ControlMask,           XK_q,      rotatelayoutaxis, {.i = +1 } },  /* flextile, 1 = layout axis */
-	{ MODKEY|ControlMask,           XK_w,      rotatelayoutaxis, {.i = +2 } },  /* flextile, 2 = master axis */
-	{ MODKEY|ControlMask,           XK_e,      rotatelayoutaxis, {.i = +3 } },  /* flextile, 3 = stack axis */
-	{ MODKEY|ControlMask,           XK_r,      rotatelayoutaxis, {.i = +4 } },  /* flextile, 4 = secondary stack axis */
+	{ MODKEY|ControlMask,           XK_7,      rotatelayoutaxis, {.i = +2 } },  /* flextile, 2 = master axis */
+	{ MODKEY|ControlMask,           XK_8,      rotatelayoutaxis, {.i = +3 } },  /* flextile, 3 = stack axis */
+	{ MODKEY|ControlMask,           XK_9,      rotatelayoutaxis, {.i = +4 } },  /* flextile, 4 = secondary stack axis */
 	{ MODKEY|ControlMask|ShiftMask, XK_q,      rotatelayoutaxis, {.i = -1 } },  /* flextile, 1 = layout axis */
-	{ MODKEY|ControlMask|ShiftMask, XK_w,      rotatelayoutaxis, {.i = -2 } },  /* flextile, 2 = master axis */
-	{ MODKEY|ControlMask|ShiftMask, XK_e,      rotatelayoutaxis, {.i = -3 } },  /* flextile, 3 = stack axis */
-	{ MODKEY|ControlMask|ShiftMask, XK_e,      rotatelayoutaxis, {.i = -4 } },  /* flextile, 4 = secondary stack axis */
+	{ MODKEY|ControlMask|ShiftMask, XK_7,      rotatelayoutaxis, {.i = -2 } },  /* flextile, 2 = master axis */
+	{ MODKEY|ControlMask|ShiftMask, XK_8,      rotatelayoutaxis, {.i = -3 } },  /* flextile, 3 = stack axis */
+	{ MODKEY|ControlMask|ShiftMask, XK_9,      rotatelayoutaxis, {.i = -4 } },  /* flextile, 4 = secondary stack axis */
 	{ MODKEY,			XK_bar, mirrorlayout,   {0} },           /* flextile, flip master and stack areas */
 };
 
