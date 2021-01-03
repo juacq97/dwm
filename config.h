@@ -191,7 +191,7 @@ ResourcePref resources[] = {
 /* keybindings! Here's only the dwm-related keybindings. To launch apps I use sxhkd */
 #include "movestack.c"
 #include "shiftview.c"
-#include "inplacerotate.c"
+//#include "inplacerotate.c"
 static Key keys[] = {
 	/* modifier                     key        function        argument */
 
