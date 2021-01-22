@@ -1,3 +1,41 @@
+int
+isdualstacklayout(Monitor *m)
+{
+	if (m->lt[m->sellt]->arrange != &flextile)
+		return 0;
+
+	int layout = m->ltaxis[LAYOUT];
+	if (layout < 0)
+		layout *= -1;
+
+	return (
+		layout == SPLIT_HORIZONTAL_DUAL_STACK ||
+		layout == SPLIT_HORIZONTAL_DUAL_STACK_FIXED ||
+		layout == SPLIT_VERTICAL_DUAL_STACK ||
+		layout == SPLIT_VERTICAL_DUAL_STACK_FIXED
+	);
+}
+
+int
+iscenteredlayout(Monitor *m, int n)
+{
+	if (m->lt[m->sellt]->arrange != &flextile)
+		return 0;
+
+	int layout = m->ltaxis[LAYOUT];
+	if (layout < 0)
+		layout *= -1;
+
+	return (
+			(layout == SPLIT_CENTERED_VERTICAL && (n - m->nmaster > 1)) ||
+			layout == SPLIT_CENTERED_VERTICAL_FIXED ||
+			(layout == SPLIT_CENTERED_HORIZONTAL && (n - m->nmaster > 1)) ||
+			layout == SPLIT_CENTERED_HORIZONTAL_FIXED ||
+			layout == FLOATING_MASTER
+	);
+}
+
+
 void
 insertclient(Client *item, Client *insertItem, int after)
 {
@@ -39,7 +77,7 @@ inplacerotate(const Arg *arg)
 
 	// Shift client
 	for (c = m->clients; c; c = c->next) {
-		if (ISVISIBLE(c) && !(c->isfloating)) {
+		if (ISVISIBLE(c) && !(c->isfloating) && !HIDDEN(c)) {
 			if (m->sel == c)
 				selidx = i;
 			if (i == m->nmaster - 1)

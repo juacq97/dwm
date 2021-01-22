@@ -59,6 +59,28 @@ getfactsforrange(Monitor *m, int an, int ai, int size, int *rest, float *fact)
 }
 
 static void
+setlayoutaxisex(const Arg *arg)
+{
+	int axis, arr;
+
+	axis = arg->i & 0x3; // lower two bytes indicates layout, master or stack1-2
+	arr = ((arg->i & 0xFC) >> 2); // remaining six upper bytes indicate arrangement
+
+	if ((axis == 0 && abs(arr) > LAYOUT_LAST)
+			|| (axis > 0 && (arr > AXIS_LAST || arr < 0)))
+		arr = 0;
+
+	selmon->ltaxis[axis] = arr;
+	selmon->pertag->ltaxis[selmon->pertag->curtag][axis] = selmon->ltaxis[axis];
+	arrange(selmon);
+}
+
+
+
+
+
+
+static void
 layout_no_split(Monitor *m, int x, int y, int h, int w, int ih, int iv, int n)
 {
 	(&flextiles[m->ltaxis[MASTER]])->arrange(m, x, y, h, w, ih, iv, n, n, 0);

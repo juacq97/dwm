@@ -292,6 +292,7 @@ static Key keys[] = {
 	{ MODKEY|ControlMask|ShiftMask, XK_8,      rotatelayoutaxis, {.i = -3 } },  /* flextile, 3 = stack axis */
 	{ MODKEY|ControlMask|ShiftMask, XK_9,      rotatelayoutaxis, {.i = -4 } },  /* flextile, 4 = secondary stack axis */
 	{ MODKEY,			XK_bar, mirrorlayout,   {0} },           /* flextile, flip master and stack areas */
+	{ MODKEY,			XK_n,     setlayoutaxisex,   {14} },           /* flextile, flip master and stack areas */
 };
 
 /* button definitions */

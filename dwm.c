@@ -54,6 +54,7 @@
                                * MAX(0, MIN((y)+(h),(m)->wy+(m)->wh) - MAX((y),(m)->wy)))
 #define ISVISIBLEONTAG(C, T)    ((C->tags & T))
 #define ISVISIBLE(C)            ISVISIBLEONTAG(C, C->mon->tagset[C->mon->seltags])
+#define HIDDEN(C)               ((getstate(C->win) == IconicState))
 #define LENGTH(X)               (sizeof X / sizeof X[0])
 #define MOUSEMASK               (BUTTONMASK|PointerMotionMask)
 #define WIDTH(X)                ((X)->w + 2 * (X)->bw)
@@ -1715,7 +1716,7 @@ movemouse(const Arg *arg)
 Client *
 nexttiled(Client *c)
 {
-	for (; c && (c->isfloating || !ISVISIBLE(c)); c = c->next);
+	for (; c && ((c->isfloating || !ISVISIBLE(c)) || HIDDEN(c)); c = c->next);
 	return c;
 }
 
@@ -1925,6 +1926,7 @@ run(void)
 							tags, LENGTH(tags), layouts, LENGTH(layouts)) < 0) {
 					fprintf(stderr, "Error handling IPC event on fd %d\n", event_fd);
 				}
+					XSync(dpy, False);
 			} else {
 				fprintf(stderr, "Got event from unknown fd %d, ptr %p, u32 %d, u64 %lu",
 						event_fd, events[i].data.ptr, events[i].data.u32,

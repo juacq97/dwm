@@ -1,6 +1,7 @@
 static void flextile(Monitor *m);
 static void mirrorlayout(const Arg *arg);
 static void rotatelayoutaxis(const Arg *arg);
+static void setlayoutaxisex(const Arg *arg);
 static void incnstack(const Arg *arg);
 
 /* Symbol handlers */
