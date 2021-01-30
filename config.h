@@ -97,8 +97,8 @@ static const unsigned int alphas[][3]      = {
 };
 
 /* tagging */
-static const char *tags[] = { "󰑊", "󰑊", "󰑊", "󰑊", "󰑊", "󰑊" };
-static const char *alttags[] = { "󰻂", "󰻂", "󰻂", "󰻂", "󰻂", "󰻂" };
+static const char *tags[] = { "󰧞", "󰧞", "󰧞", "󰧞", "󰧞", "󰧞" };
+static const char *alttags[] = { "󰑊", "󰑊", "󰑊", "󰑊", "󰑊", "󰑊" };
 
 static const Rule rules[] = {
 	/* xprop(1):
@@ -108,7 +108,7 @@ static const Rule rules[] = {
 	/* class      instance    title       tags mask  isfloating  floatpos monitor */
   { "Gimp",          NULL,       NULL,       0,            1,         NULL,       -1 },
   { "mpv",           NULL,       NULL,       0,            1,         NULL,       -1 },
-  { "Lxappareance",  NULL,       NULL,       0,            1,         NULL,       -1 },
+  { "lxappareance",  NULL,       NULL,       0,            1,         NULL,       -1 },
   { "Pavucontrol",   NULL,       NULL,       0,            1,         NULL,       -1 },
   { "qt5ct",         NULL,       NULL,       0,            1,         NULL,       -1 },
   { "Gucharmap",     NULL,       NULL,       0,            1,         NULL,       -1 },
@@ -138,12 +138,11 @@ static const Layout layouts[] = {
 	{ "[D]",         deck },
 	{ NULL,          NULL }, */
 
-	/* symbol     arrange function, { nmaster, nstack, layout, master axis, stack axis, secondary stack axis } */
+	/* symbol   arrange function, { nmaster, nstack, layout, master axis, stack axis, secondary stack axis } */
 	{ "󰙀",      flextile,         { -1, -1, SPLIT_VERTICAL, TOP_TO_BOTTOM, TOP_TO_BOTTOM, 0, NULL } }, // default tile layout
+	{ "󱒎",      flextile,         { -1, -1, SPLIT_VERTICAL, TOP_TO_BOTTOM, GAPPLESSGRID_ALT1, 0, NULL } }, // default tile layout
 	{ "󱒅",      flextile,         { -1, -1, SPLIT_CENTERED_VERTICAL, TOP_TO_BOTTOM, TOP_TO_BOTTOM, 0, NULL } }, // centeredmaster
 	{ "󰋁",      flextile,         { -1, -1, NO_SPLIT, GAPPLESSGRID, 0, 0, NULL } }, // gappless grid
-	{ "[M]",      flextile,         { -1, -1, NO_SPLIT, MONOCLE, 0, 0, monoclesymbols } }, // monocle
-	{ "[D]",      flextile,         { -1, -1, SPLIT_VERTICAL, TOP_TO_BOTTOM, MONOCLE, 0, NULL } }, // deck
 	{ NULL,       NULL,             {0} },
 };
 
@@ -152,7 +151,11 @@ static const Layout doublestack[] = {
 	{ "|[|][|]",      flextile,         { -1, -1, SPLIT_VERTICAL_DUAL_STACK, TOP_TO_BOTTOM, LEFT_TO_RIGHT, LEFT_TO_RIGHT, NULL } }, // two stack, both horizontal
 	{ "|[D][|]",      flextile,         { -1, -1, SPLIT_VERTICAL_DUAL_STACK, TOP_TO_BOTTOM, MONOCLE, LEFT_TO_RIGHT, NULL } }, // two stack, monocle and horizontal
 	{ "|[|][D]",      flextile,         { -1, -1, SPLIT_VERTICAL_DUAL_STACK, TOP_TO_BOTTOM, LEFT_TO_RIGHT, MONOCLE, NULL } }, // two stack, horizontal and monocle
+};
 
+static const Layout full[] = {
+	{ "[M]",      flextile,         { -1, -1, NO_SPLIT, MONOCLE, 0, 0, monoclesymbols } }, // monocle
+	{ "[D]",      flextile,         { -1, -1, SPLIT_VERTICAL, TOP_TO_BOTTOM, MONOCLE, 0, NULL } }, // deck
 };
 
 /* key definitions */
@@ -203,8 +206,8 @@ static Key keys[] = {
         { MODKEY|ControlMask,           XK_k,      inplacerotate,  {.i = -1} }, 
         { MODKEY|ShiftMask,             XK_g,      zoom,           {0} }, //send window to master
         { MODKEY,                       XK_g,      switchcol,      {0} }, //swap focus between master and stack
-        { MODKEY,                       XK_h,      setmfact,       {.f = -0.05} }, // Shrink master
-        { MODKEY,                       XK_l,      setmfact,       {.f = +0.05} }, //Grow master
+        { MODKEY,                       XK_h,      setmfact,       {.f = -0.02} }, // Shrink master
+        { MODKEY,                       XK_l,      setmfact,       {.f = +0.02} }, //Grow master
         { MODKEY|ControlMask,           XK_comma,  incnmaster,     {.i = +1 } }, 
         { MODKEY|ControlMask,           XK_period, incnmaster,     {.i = -1 } }, 
         { MODKEY|ShiftMask,             XK_j,      movestack,      {.i = +1 } }, 
@@ -235,8 +238,8 @@ static Key keys[] = {
 
 
 	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} }, // Grid for all tags
-	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[3]} }, // Grid for all tags
-	{ MODKEY|ShiftMask,                       XK_m,      setlayout,      {.v = &layouts[4]} }, // Grid for all tags
+	{ MODKEY,                       XK_m,      setlayout,      {.v = &full[0]} }, // Grid for all tags
+	{ MODKEY|ShiftMask,                       XK_m,      setlayout,      {.v = &full[1]} }, // Grid for all tags
 	{ MODKEY,                       XK_s,      togglefloating, {0} }, 
 	{ MODKEY,			XK_F11,    togglefullscreen,  {0} }, 
 	{ MODKEY|ShiftMask,	     	XK_F11,    togglefakefullscreen,  {0} }, // Fullscreen on the tile
@@ -283,16 +286,19 @@ static Key keys[] = {
 	{ MODKEY|ControlMask,           XK_i,      incnstack,      {.i = +1 } },
 	{ MODKEY|ControlMask,           XK_o,      incnstack,      {.i = -1 } },
 
+
+
 	{ MODKEY|ControlMask,           XK_q,      rotatelayoutaxis, {.i = +1 } },  /* flextile, 1 = layout axis */
-	{ MODKEY|ControlMask,           XK_7,      rotatelayoutaxis, {.i = +2 } },  /* flextile, 2 = master axis */
-	{ MODKEY|ControlMask,           XK_8,      rotatelayoutaxis, {.i = +3 } },  /* flextile, 3 = stack axis */
-	{ MODKEY|ControlMask,           XK_9,      rotatelayoutaxis, {.i = +4 } },  /* flextile, 4 = secondary stack axis */
 	{ MODKEY|ControlMask|ShiftMask, XK_q,      rotatelayoutaxis, {.i = -1 } },  /* flextile, 1 = layout axis */
-	{ MODKEY|ControlMask|ShiftMask, XK_7,      rotatelayoutaxis, {.i = -2 } },  /* flextile, 2 = master axis */
-	{ MODKEY|ControlMask|ShiftMask, XK_8,      rotatelayoutaxis, {.i = -3 } },  /* flextile, 3 = stack axis */
-	{ MODKEY|ControlMask|ShiftMask, XK_9,      rotatelayoutaxis, {.i = -4 } },  /* flextile, 4 = secondary stack axis */
+
+	{ MODKEY|ControlMask,           XK_plus,      rotatelayoutaxis, {.i = +2 } },  /* flextile, 2 = master axis */
+	{ MODKEY|ControlMask, XK_dead_acute,      rotatelayoutaxis, {.i = -2 } },  /* flextile, 2 = master axis */
+	{ MODKEY,	                XK_plus,      rotatelayoutaxis, {.i = +3 } },  /* flextile, 3 = stack axis */
+	{ MODKEY,			XK_dead_acute,      rotatelayoutaxis, {.i = -3 } },  /* flextile, 3 = stack axis */
+	{ MODKEY|Mod1Mask,		XK_plus,      rotatelayoutaxis, {.i = +4 } },  /* flextile, 4 = secondary stack axis */
+	{ MODKEY|Mod1Mask,		XK_dead_acute,      rotatelayoutaxis, {.i = -4 } },  /* flextile, 4 = secondary stack axis */
+
 	{ MODKEY,			XK_bar, mirrorlayout,   {0} },           /* flextile, flip master and stack areas */
-	{ MODKEY,			XK_n,     setlayoutaxisex,   {14} },           /* flextile, flip master and stack areas */
 };
 
 /* button definitions */
