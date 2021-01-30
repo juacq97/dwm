@@ -54,6 +54,7 @@
                                * MAX(0, MIN((y)+(h),(m)->wy+(m)->wh) - MAX((y),(m)->wy)))
 #define ISVISIBLEONTAG(C, T)    ((C->tags & T))
 #define ISVISIBLE(C)            ISVISIBLEONTAG(C, C->mon->tagset[C->mon->seltags])
+#define HIDDEN(C)               ((getstate(C->win) == IconicState))
 #define LENGTH(X)               (sizeof X / sizeof X[0])
 #define MOUSEMASK               (BUTTONMASK|PointerMotionMask)
 #define WIDTH(X)                ((X)->w + 2 * (X)->bw)
@@ -613,9 +614,9 @@ buttonpress(XEvent *e)
 	if (ev->window == selmon->barwin) {
                 if (ev->x < ble) {
                         if (ev->x < ble - blw) {
-                                i = -1, x = -ev->x;
+                                i = x = 0;
                                 do
-                                        x += TEXTW(tags[++i]);
+                                        x += TEXTW(tags[i]);
                                 while (x <= 0);
                                 click = ClkTagBar;
                                 arg.ui = 1 << i;
@@ -1071,7 +1072,15 @@ drawbar(Monitor *m)
 		if (occ & 1 << i)
 			drw_rect(drw, x + boxs, boxs, boxw, boxw,
 				m == selmon && selmon->sel && selmon->sel->tags & 1 << i,
-				urg & 1 << i);
+			urg & 1 << i);
+
+
+		/* Uncomment this if you want the little box over tags
+		if (occ & 1 << i)
+			drw_rect(drw, x + boxs, boxs, boxw, boxw,
+				m == selmon && selmon->sel && selmon->sel->tags & 1 << i,
+				urg & 1 << i); 
+				*/
 		x += w;
 	}
 	w = TEXTW(m->ltsymbol);
@@ -1705,7 +1714,7 @@ movemouse(const Arg *arg)
 Client *
 nexttiled(Client *c)
 {
-	for (; c && (c->isfloating || !ISVISIBLE(c)); c = c->next);
+	for (; c && ((c->isfloating || !ISVISIBLE(c)) || HIDDEN(c)); c = c->next);
 	return c;
 }
 
@@ -1915,6 +1924,7 @@ run(void)
 							tags, LENGTH(tags), layouts, LENGTH(layouts)) < 0) {
 					fprintf(stderr, "Error handling IPC event on fd %d\n", event_fd);
 				}
+					XSync(dpy, False);
 			} else {
 				fprintf(stderr, "Got event from unknown fd %d, ptr %p, u32 %d, u64 %lu",
 						event_fd, events[i].data.ptr, events[i].data.u32,
@@ -2324,7 +2334,7 @@ setup(void)
 	drw = drw_create(dpy, screen, root, sw, sh, visual, depth, cmap);
 	if (!drw_fontset_create(drw, fonts, LENGTH(fonts)))
 		die("no fonts could be loaded.");
-	lrpad = drw->fonts->h;
+	lrpad = user_tp ? user_tp : drw->fonts->h;
 	bh = user_bh ? user_bh : drw->fonts->h + 2;
 	updategeom();
 	/* init atoms */

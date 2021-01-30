@@ -97,8 +97,14 @@ static const unsigned int alphas[][3]      = {
 };
 
 /* tagging */
-static const char *tags[] = { "󰧞", "󰧞", "󰧞", "󰧞", "󰧞", "󰧞" };
-static const char *alttags[] = { "󰑊", "󰑊", "󰑊", "󰑊", "󰑊", "󰑊" };
+/* tagging: refer to https://github.com/bakkeby/patches/wiki/tagicons */
+static const char *tags[NUMTAGS] = { NULL };  /* left for compatibility reasons, i.e. code that checks LENGTH(tags) */
+static char *tagicons[][NUMTAGS] = {
+	[IconsDefault]        = { "󰧞", "󰧞", "󰧞", "󰧞", "󰧞", "󰧞" },
+	[IconsVacant]         = { NULL },
+	[IconsOccupied]       = { "󰻂", "󰻂", "󰻂", "󰻂", "󰻂", "󰻂" },
+	[Icons
+};
 
 static const Rule rules[] = {
 	/* xprop(1):
@@ -319,6 +325,8 @@ static Button buttons[] = {
 	{ ClkTagBar,            0,              Button3,        toggleview,     {0} },
 	{ ClkTagBar,            MODKEY,         Button1,        tag,            {0} },
 	{ ClkTagBar,            MODKEY,         Button3,        toggletag,      {0} },
+	{ ClkTagBar,            0,              Button4,        cycleiconset,   {.i = +1 } },
+	{ ClkTagBar,            0,              Button5,        cycleiconset,   {.i = -1 } },
 	{ ClkClientWin,		MODKEY,		Button1,	winview,	{0} },
 };
 
