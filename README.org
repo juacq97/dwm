@@ -1,0 +1,466 @@
+#+TITLE:dwm: dynamic window manager
+#+PROPERTY: header-args :tangle config.h
+
+* About this repo
+Here is my own build of dwm, the dynamic window manager. This is a backup of the source code so I can easily download it again. I decided to use it because I wanted to migrate from bspwm to something else, and after try some options, including awesomewm, xmonad and qtile, I found dwm the easiest to configure (yes, that's right).
+
+By default, dwm can be difficult to use. It has almost no features and lacks some basic ones that you can expect. Adding new features isn't too straight  foward either, since you need to apply some patches to the source code and solve conflicts by yourself. The good thing is that there's a lot of patches from different sources that you can apply, and most of the time the manual intervention consist only on copy and paste some code, so even if you don't know anything about C (like me) you can do it using just logic. Sometimes though, you need to solve issues like conflicts with other patches, so be prepared with git and mentalized that some patches requires a lot of work. A good way to know if a patch will be problematica is reading the ~.diff~ file: if there's a lot of "-" signs be prepared to have some bad times.
+
+My build has a lot of features I find useful and I use (almost all of) it everyday. Here's a partial list of features I added:
++ Toggle all tags at the same time
++ Customizable tag names
++ Gaps between windows 
++ IPC and ~dwm-msg~ to send commands from the terminal
++ netclientliststacking: the only use to this for me is share individual windows on Zoom
++ Different layouts per tag
++ Flextile: A customizable layout, you can recreate common layouts and it has different layout schemes for master, stack 1 and stack 2 areas
++ Scratchpad, not named scratchpad. This is more like i3, any window can be send to the scratchpad instead of only the ones you selected on the ~rules~ array.
++ Takes colors from ~.Xresources~
++ Support for ~dwmblocks~, colors on the panel and clickability.
++ And more...
+
+This README file is written in org-mode, so it's possible to read it on Emacs. This is also my ~config.h~ since I have documented that file here and it's created from this file. I did it to make it easier to modify and instead of a lot of comments, I can have more information here. To create ~config.h~ run ~M-x org-babel-tangle RET~.
+* Include and define
+Some features needs to be included in this file. Let's call them from here.
+- vanitygaps: It adds gaps
+- movestack: Allows to move windows
+- shiftview: Allows to move to the next tag with a keybinding.
+#+begin_src c
+#+end_src
+* Variables
+Here's some basic variables that defines some of the basics of dwm:
+- borderpx: The size of the border
+- snap: Floating windows will snap to the borders of the screen. The number indicates the pixels  at which the window must be to be snapped.
+- gappiv, gappih, gappoh, gappov: Inner and outter gaps, vertically and horizontally.
+- mfact: The factor of the master area
+- nmaster: The default number of clients on master area
+- nstack: The number of clients in stack area. 0 means no limit
+- resizehints: Those hints indicates to the window manager to keep certain size. I don't like it.
+- Smartgaps: 1 means no gaps with just one window
+- user_bh: This is a variable of mine and determines the height of the top panel. 0 mens height equals to the font size (default).
+- user_top: Another variable I added. Determines the padding between tag numbers. 0 means default padding.
+- showbar: 0 means no bar
+- topbar: 0 means bottom bar
+- attachmode: How the new windows should be attached: 0 means master, 1 means above the focused window, 2 means on top of the stack, 3 means below the focused window and 4 means at the bottom of the stack
+- fonts: An array of fonts.
+
+#+begin_src c
+  static const unsigned int borderpx  = 3;       
+  static const unsigned int snap      = 6;      
+  static const unsigned int gappih    = 10;      
+  static const unsigned int gappiv    = 10;      
+  static const unsigned int gappoh    = 6;      
+  static const unsigned int gappov    = 6;      
+  static const float mfact            = 0.5; 
+  static const int nmaster            = 1; 
+  static const int nstack             = 0;
+  static const int resizehints        = 0; 
+  static const int user_bh            = 25; 
+  static const int user_tp            = 5;  
+  static const int showbar            = 1;  
+  static const int topbar             = 1;
+  static const int attachmode         = 2; 
+  static int smartgaps                = 0;  
+  static int floatposgrid_x           = 5;  
+  static int floatposgrid_y           = 5;  
+  static const char *fonts[]          = {
+    "Futura Bk BT:Book:size=10",
+    "Material Design Icons:Regular:pixelsize=14:antialias=true"
+  };
+#+end_src
+* Appearance
+** Colors
+ I'm using an implementation of the [[https://dwm.suckless.org/patches/statuscolors/][colors patch]]. This allows to define an array of colorschemes, and that colorschemes can be called from scripts using raw characters starting with \x0b (~~). What this means is, if I want to use the ~SchemeCol1~ scheme, in my scripts I need to something like this:
+
+ #+begin_quote
+ echo "Hello dwm" 
+ #+end_quote
+ 
+ First of all, lets define some colors. This colors will be overwrrited by ~.Xresources~ though.
+ #+begin_src c
+ static char back[]   = "#1C1E27";
+ static char fore[]   = "#CACACC";
+ static char border[] = "#CACACC";
+ static char col0[]   = "#6C6F93";
+ static char col1[]   = "#E4436F";
+ static char col2[]   = "#24E39D";
+ static char col3[]   = "#EDA685";
+ static char col4[]   = "#00A5AF";
+ static char col5[]   = "#B367CF";
+ static char col6[]   = "#00A5AF";
+ static char col7[]   = "#CACACC";
+ static char col8[]   = "#6C6F93";
+ static char col9[]   = "#E4436F";
+ static char col10[]  = "#24E39D";
+ static char col11[]  = "#EDA685";
+ static char col12[]  = "#00A5AF";
+ static char col13[]  = "#B367CF";
+ static char col14[]  = "#00A5AF";
+ static char col15[]  = "#CACACC";
+ static char spotify[]= "#1FC167"; //Spotify green
+ #+end_src
+
+ Now, the array of colorschemes:
+ #+begin_src c
+   static char *colors[][3] = {
+     /*  Name              fg      bg    border       code */
+     [SchemeNorm]     = { fore,    back, back   }, // \x0b
+     [SchemeSel]      = { fore,    back, border }, // \x0c
+     [SchemeStatus]   = { fore,    back, border }, // \x0d
+     [SchemeTagsSel]  = { border,  back, border }, // \x0e
+     [SchemeTagsNorm] = { fore,    back, border }, // \x0f
+     [SchemeInfoSel]  = { fore,    back, border }, // \x10
+     [SchemeInfoNorm] = { fore,    back, border }, // \x11
+     [SchemeCol1]     = { col1,    back, col0   }, // \x12 
+     [SchemeCol2]     = { col2,    back, col0   }, // \x13
+     [SchemeCol3]     = { col3,    back, col0   }, // \x14 
+     [SchemeCol4]     = { col4,    back, col0   }, // \x15
+     [SchemeCol5]     = { col5,    back, col0   }, // \x16 
+     [SchemeCol6]     = { col6,    back, col0   }, // \x17
+     [SchemeCol7]     = { col7,    back, col0   }, // \x18
+     [SchemeCol8]     = { col8,    back, col0   }, // \x19
+     [SchemeCol9]     = { col9,    back, col0   }, // \x1a
+     [SchemeCol10]    = { col10,   back, col0   }, // \x1b
+     [SchemeCol11]    = { col11,   back, col0   }, // \x1c 
+     [SchemeCol12]    = { spotify, back, col0   }, // \x1d
+   };
+ #+end_src
+ 
+Since I use the ~xrdb~ patch, this array it's needed.
+#+begin_src c
+  ResourcePref resources[] = {
+    { "back",        STRING,  &back },
+    { "fore",        STRING,  &fore },
+    { "cursorColor", STRING,  &border },
+    { "col0",	 STRING,  &col0 },
+    { "col1",	 STRING,  &col1 },
+    { "col2",	 STRING,  &col2 },
+    { "col3",	 STRING,  &col3 },
+    { "col4",	 STRING,  &col4 },
+    { "col5",	 STRING,  &col5 },
+    { "col6",	 STRING,  &col6 },
+    { "col7",	 STRING,  &col7 },
+    { "col8",	 STRING,  &col8 },
+    { "col9",	 STRING,  &col9 },
+    { "col10",	 STRING,  &col10 },
+    { "col11",	 STRING,  &col11 },
+    { "col12",	 STRING,  &col12 },
+    { "col13",	 STRING,  &col13 },
+    { "col14",	 STRING,  &col14 },
+    { "col15",	 STRING,  &col15 },
+  };
+#+end_src
+** Alpha
+ I added the [[https://dwm.suckless.org/patches/alpha/][alpha patch]], but it doesn't works as I expected. It removes all the back color, so with partial transparency I get a white-washed panel. It works similar to the colors: I need to declare the level of opacity and then and array for every colorscheme:
+
+ #+begin_src c
+   static const unsigned int baralpha = 255; //The alpha channel
+   static const unsigned int borderalpha = OPAQUE; // The border alpha channel
+   static const unsigned int alphas[][3] = {
+     /*                    fg       bg        border     */
+     [SchemeNorm]     = { OPAQUE, baralpha, borderalpha },
+     [SchemeSel]      = { OPAQUE, baralpha, borderalpha },
+     [SchemeStatus]   = { OPAQUE, baralpha, borderalpha },
+     [SchemeTagsSel]  = { OPAQUE, baralpha, borderalpha },
+     [SchemeTagsNorm] = { OPAQUE, baralpha, borderalpha },
+     [SchemeInfoSel]  = { OPAQUE, baralpha, borderalpha },
+     [SchemeInfoNorm] = { OPAQUE, baralpha, borderalpha },
+     [SchemeCol1]     = { OPAQUE, baralpha, borderalpha },
+     [SchemeCol2]     = { OPAQUE, baralpha, borderalpha },
+     [SchemeCol3]     = { OPAQUE, baralpha, borderalpha },
+     [SchemeCol4]     = { OPAQUE, baralpha, borderalpha },
+     [SchemeCol5]     = { OPAQUE, baralpha, borderalpha },
+     [SchemeCol6]     = { OPAQUE, baralpha, borderalpha },
+     [SchemeCol7]     = { OPAQUE, baralpha, borderalpha },
+     [SchemeCol8]     = { OPAQUE, baralpha, borderalpha },
+     [SchemeCol9]     = { OPAQUE, baralpha, borderalpha },
+     [SchemeCol10]    = { OPAQUE, baralpha, borderalpha },
+     [SchemeCol11]    = { OPAQUE, baralpha, borderalpha },
+     [SchemeCol12]    = { OPAQUE, baralpha, borderalpha },
+   };
+ #+end_src
+* Tags
+Tags are like virtual desktops but better. On dwm you can assing tags to windows, normally every window has just one tag, so it'll work just as the desktops of others window mangers. The power of tags appears when you assign more than one tag to windows, for example, you can see the exact same terminal on tag 1 and 3, or you can see the content of tag 4 without leave the focus on tag 1. I need to confess that I don't use tags this way too often though, and most of the time I use just one tag per window.
+
+I'm using the  [[https://github.com/bakkeby/patches/wiki/tagicons][tagicons]] patch, so the way I define tags it's kinda different to the default dwm configuration. I have three arrays of tags, explained at detail on the wiki of the patch:
+- IconsDefault: The default icon of tags. Can be an icon a number or a word
+- IconsVacant: It works only if you have ~IconsDefault~ set to ~NULL~. It's the icons for focused empty tags.
+- IconsOccupied: The icon for occupied tags.
+#+begin_src c
+  static const char *tags[NUMTAGS] = { NULL };  /* left for compatibility reasons, i.e. code that checks LENGTH(tags) */
+  static char *tagicons[][NUMTAGS] = {
+    [IconsDefault]  = { "󰧞", "󰧞", "󰧞", "󰧞", "󰧞", "󰧞" },
+    [IconsVacant]   = { NULL },
+    [IconsOccupied] = { "󰻂", "󰻂", "󰻂", "󰻂", "󰻂", "󰻂" },
+  };
+#+end_src
+
+* Rules
+You can define a set of rules for certain windows. For example, I want mpv to always float, or maybe I want firefox to always be oppened on tag 2. To know the class of a window, you need to run ~xprop~ on a terminal and then click over a window, then look for the line ~WM_CLASS(STRING) = instance, class~ and ~WM_NAME(STRING) = title~ to know it.
+
+#+begin_src c
+  static const Rule rules[] = {
+    /* class        instance       title    tags mask  isfloating  floatpos monitor */
+    { "Gimp",          NULL,       NULL,       0,         1,         NULL,    -1 },
+    { "mpv",           NULL,       NULL,       0,         1,         NULL,    -1 },
+    { "lxappareance",  NULL,       NULL,       0,         1,         NULL,    -1 },
+    { "Pavucontrol",   NULL,       NULL,       0,         1,         NULL,    -1 },
+    { "qt5ct",         NULL,       NULL,       0,         1,         NULL,    -1 },
+    { "Gucharmap",     NULL,       NULL,       0,         1,         NULL,    -1 },
+    { "Sxiv",          NULL,       NULL,       0,         1,         NULL,    -1 },
+    { "kruler",        NULL,       NULL,       0,         1,         NULL,    -1 },
+    { "zoom",          NULL,       NULL,       0,         1,         NULL,    -1 },
+    { "Connman-gtk",   NULL,       NULL,       0,         1,         NULL,    -1 },
+    { "Alacritty", "calendar.txt", NULL,       0,         1,         NULL,    -1 },
+  };
+#+end_src
+* Layouts
+There's a bunch of layout out there for dwm. I'm using the [[https://github.com/bakkeby/patches/wiki/flextile-deluxe][flextile-deluxe]] layout, a very powerful layout that allows to define layouts and change the arrangement of the master, stack 1 and stack 2 areas (this layout introduces the concept of a second stack).
+
+I have defined three arrays of layouts. This way I can cycle for one array with one keybinding, and cycle the others with others keybindings.
+#+begin_src c
+  #include "vanitygaps.c"
+  static const Layout layouts[] = {
+  /* symbol  arrange,  { nmaster, nstack, layout, master axis, stack axis, secondary stack axis } */
+    { "󰙀", flextile,  { -1, -1, SPLIT_VERTICAL, TOP_TO_BOTTOM, TOP_TO_BOTTOM, 0, NULL } }, // default tile layout
+    { "󱒅", flextile,  { -1, -1, SPLIT_CENTERED_VERTICAL, TOP_TO_BOTTOM, TOP_TO_BOTTOM, 0, NULL } }, // centeredmaster
+    { "󱒎", flextile,  { -1, -1, SPLIT_VERTICAL, TOP_TO_BOTTOM, GAPPLESSGRID_ALT1, 0, NULL } }, // Grid stack
+    { "󰋁", flextile,  { -1, -1, NO_SPLIT, GAPPLESSGRID, 0, 0, NULL } }, // gappless grid
+    { NULL,   NULL,    {0} },
+  };
+
+  static const Layout doublestack[] = {
+    { "|[D][D]", flextile, { -1, -1, SPLIT_VERTICAL_DUAL_STACK, TOP_TO_BOTTOM, MONOCLE, MONOCLE, NULL } }, // 2 stacks, both monocle
+    { "|[|][|]", flextile, { -1, -1, SPLIT_VERTICAL_DUAL_STACK, TOP_TO_BOTTOM, LEFT_TO_RIGHT, LEFT_TO_RIGHT, NULL } }, // two stack, both horizontal
+    { "|[D][|]", flextile, { -1, -1, SPLIT_VERTICAL_DUAL_STACK, TOP_TO_BOTTOM, MONOCLE, LEFT_TO_RIGHT, NULL } }, // two stack, monocle and horizontal
+    { "|[|][D]", flextile, { -1, -1, SPLIT_VERTICAL_DUAL_STACK, TOP_TO_BOTTOM, LEFT_TO_RIGHT, MONOCLE, NULL } }, // two stack, horizontal and monocle
+  };
+
+  static const Layout full[] = {
+    { "[M]", flextile, { -1, -1, NO_SPLIT, MONOCLE, 0, 0, monoclesymbols } }, // monocle
+    { "[D]", flextile, { -1, -1, SPLIT_VERTICAL, TOP_TO_BOTTOM, MONOCLE, 0, NULL } }, // deck
+  };
+#+end_src
+
+* Keybindings
+Now it's time to define my keybindings. Here I only have the window management related keybindings, the ones for launch applications are on my ~sxhkd~ config file. This allows me to easily change to another X window manager without problems.
+
+First, lets define ~MODKEY~ as the super key, and the keybindings to toggle tags (for some reason you need to define it here).
+
+#+begin_src c
+  #define MODKEY Mod4Mask
+  #define TAGKEYS(KEY,TAG)\
+    { MODKEY,             KEY, view,       {.ui = 1 << TAG} }, \
+    { MODKEY|Mod1Mask,	KEY, toggleview, {.ui = 1 << TAG} }, \
+    { MODKEY|ShiftMask,   KEY, tag,        {.ui = 1 << TAG} }, \
+    { MODKEY|ControlMask, KEY, toggletag,  {.ui = 1 << TAG} },
+#+end_src
+
+And now the keybindings. I'll divide this in a lot of subheadings.
+#+begin_src c
+  #include "movestack.c"
+  #include "shiftview.c"
+  static Key keys[] = {
+#+end_src
+
+** Window management
+All the keybindings related to movement of windows. I'll explain here only the ones that aren't too explicit:
+- zoom: swap window with master
+- switchcol: moves the focus from stack to master and viceversa
+- setmfact: change the size of master
+- incmaster: Add or remove windows on master
+
+#+begin_src c
+  { MODKEY|ShiftMask,   XK_q,      killclient,    {0} }, 
+  { MODKEY,             XK_j,      focusstack,    {.i = +1 } }, 
+  { MODKEY,             XK_k,      focusstack,    {.i = -1 } },
+  { MODKEY|ControlMask, XK_j,      inplacerotate, {.i = +1} }, 
+  { MODKEY|ControlMask, XK_k,      inplacerotate, {.i = -1} }, 
+  { MODKEY|ShiftMask,   XK_g,      zoom,          {0} }, 
+  { MODKEY,             XK_g,      switchcol,     {0} }, 
+  { MODKEY,             XK_h,      setmfact,      {.f = -0.02} }, 
+  { MODKEY,             XK_l,      setmfact,      {.f = +0.02} }, 
+  { MODKEY|ControlMask, XK_comma,  incnmaster,    {.i = +1 } }, 
+  { MODKEY|ControlMask, XK_period, incnmaster,    {.i = -1 } }, 
+  { MODKEY|ShiftMask,   XK_j,      movestack,     {.i = +1 } }, 
+  { MODKEY|ShiftMask,   XK_k,      movestack,     {.i = -1 } }, 
+#+end_src
+
+** Tags
+Keybindings about tags. 
+- view {0}: back and forth with the last focused tag
+- view {.ui = ~0 }: view all tags at once
+- tag {.ui = ~0 }: Put window on all the tags
+- winview: when viewing two or more tags, focus only the tag of the focused window
+- shiftview: focus next or prev tag
+
+#+begin_src c
+  { MODKEY,             XK_Tab, view,        {0} }, 
+  { MODKEY,             XK_0,   view,        {.ui = ~0 } }, 
+  { MODKEY,             XK_0,   setlayout,   {.v = &layouts[2]} }, 
+  { MODKEY|ShiftMask,   XK_0,   tag,         {.ui = ~0 } }, 
+  { MODKEY|ShiftMask,   XK_o,   winview,     {0} }, 
+  { MODKEY|ShiftMask,   XK_o,   setlayout,   {.v = &layouts[0]} }, 
+  { MODKEY|ControlMask, XK_l,   shiftview,   { .i = +1 } }, 
+  { MODKEY|ControlMask, XK_h,   shiftview,   { .i = -1 } }, 
+    TAGKEYS(            XK_1,                0) 
+    TAGKEYS(            XK_2,                1) 
+    TAGKEYS(            XK_3,                2) 
+    TAGKEYS(            XK_4,                3) 
+    TAGKEYS(            XK_5,                4) 
+    TAGKEYS(            XK_6,                5) 
+#+end_src
+** Layouts
+The keybindings about layouts.
+ M= Modkey  
+ S= Shift    
+ A = Alt    
+ C = Control 
+
+| Keybindig              | Action                      |
+|------------------------+-----------------------------|
+| M-t                    | Master & stack              |
+| M-<bar>                | Mirror                      |
+| M-m                    | Monocle                     |
+| M-S-m                  | Deck (just one stack)       |
+| M-s                    | Toggle floating             |
+| M-ALT-,                | Previous layout             |
+| M-ALT-.                | Next layout                 |
+| M-F11                  | Fullscreen                  |
+| M-S-F11                | Fake fullscreen             |
+| M-C-m                  | Two stacks, both deck       |
+| M-C-i                  | Two stacks, top one deck    |
+| M-C-u                  | Two stacks, bottom one deck |
+| M-C-o                  | Two stacks, both grid       |
+| M-C-q/M-C-S-q          | FLEXTILE: cycle layout      |
+| M-C-+/M-C-<dead_acute> | FLEXTILE: cycle master      |
+| M-+/M-<dead_acute>     | FLEXTILE: cycle stack 1     |
+| M-A-+/M-A-<dead_acute> | FLEXTILE: cycle stack 2     |
+
+#+begin_src c
+  { MODKEY,  XK_t,    setlayout,         {.v = &layouts[0]} }, 
+  { MODKEY,  XK_bar, mirrorlayout,      {0} },           
+  { MODKEY,  XK_m,   setlayout,         {.v = &full[0]} }, 
+  { MODKEY,  XK_s,   togglefloating,    {0} }, 
+  { MODKEY,  XK_F11, togglefullscreen,  {0} }, 
+
+  { MODKEY|Mod1Mask, XK_comma,  cyclelayout, {.i = -1 } }, 
+  { MODKEY|Mod1Mask, XK_period, cyclelayout, {.i = +1 } }, 
+
+  { MODKEY|ShiftMask, XK_m,   setlayout,             {.v = &full[1]} },  
+  { MODKEY|ShiftMask, XK_F11,    togglefakefullscreen,  {0} }, 
+
+  { MODKEY|ControlMask,  XK_m,  setlayout,  {.v = &doublestack[0]} }, 
+  { MODKEY|ControlMask,  XK_i,  setlayout,  {.v = &doublestack[2]} },
+  { MODKEY|ControlMask,  XK_u,  setlayout,  {.v = &doublestack[3]} },
+  { MODKEY|ControlMask,  XK_o,  setlayout,  {.v = &doublestack[1]} },
+
+  { MODKEY|ControlMask,           XK_q,          rotatelayoutaxis, {.i = +1 } },  
+  { MODKEY|ControlMask|ShiftMask, XK_q,          rotatelayoutaxis, {.i = -1 } },  
+  { MODKEY|ControlMask,           XK_plus,       rotatelayoutaxis, {.i = +2 } },  
+  { MODKEY|ControlMask,           XK_dead_acute, rotatelayoutaxis, {.i = -2 } },  
+  { MODKEY|Mod1Mask,		XK_plus,         rotatelayoutaxis, {.i = +4 } },  
+  { MODKEY|Mod1Mask,		XK_dead_acute,   rotatelayoutaxis, {.i = -4 } },  
+#+end_src
+
+** Monitors
+On a multihead setup, this keybindings are very useful. dwm has the same number of tags for every monitor and I like that. Most of the time though, I use just one tag on my second monitor. This keybinding is useful too when I need to use a projector.
+
+#+begin_src c
+  { MODKEY,                      XK_comma,  focusmon,       {.i = -1 } }, 
+  { MODKEY,                      XK_period, focusmon,       {.i = +1 } }, 
+  { MODKEY|ShiftMask,            XK_comma,  tagmon,         {.i = -1 } }, 
+  { MODKEY|ShiftMask,            XK_period, tagmon,         {.i = +1 } }, 
+  //{ MODKEY|Mod1Mask|ControlMask, XK_comma,  tagswapmon,     {.i = +1 } }, 
+  //{ MODKEY|Mod1Mask|ControlMask, XK_period, tagswapmon,     {.i = -1 } },
+#+end_src
+** dwm specific
+There some options and keybindings of some features of dwm... actually, I did't know where to put this.
+#+begin_src c
+  { MODKEY,          XK_b,  togglebar, {0} }, 
+  { MODKEY|Mod1Mask, XK_l,  setcfact,  {.f = +0.25} }, 
+  { MODKEY|Mod1Mask, XK_h,  setcfact,  {.f = -0.25} }, 
+  { MODKEY|Mod1Mask, XK_o,  setcfact,  {.f =  0.00} },
+  { MODKEY,          XK_F8, xrdb,      {.v = NULL } },
+
+  { MODKEY,	      XK_z, scratchpad_show,    {0} },
+  { MODKEY|Mod1Mask,    XK_z, scratchpad_hide,    {0} },
+  { MODKEY|ControlMask, XK_z, scratchpad_remove,  {0} },
+  { MODKEY|ControlMask, XK_i, incnstack,          {.i = +1 } },
+  { MODKEY|ControlMask, XK_o, incnstack,          {.i = -1 } },
+#+end_src
+** Gaps
+The [[https://github.com/bakkeby/patches/blob/master/dwm/dwm-vanitygaps-6.2.diff][vanity-gaps patch]] introduces a lot of options to change inner and outter gaps. I don't use it too much though.
+
+#+begin_src c
+  { MODKEY|Mod1Mask,              XK_u,      incrgaps,       {.i = +1 } },
+  { MODKEY|Mod1Mask|ShiftMask,    XK_u,      incrgaps,       {.i = -1 } },
+  { MODKEY|Mod1Mask,              XK_0,      togglegaps,     {0} },
+  { MODKEY|Mod1Mask|ShiftMask,    XK_0,      defaultgaps,    {0} },
+
+  /*{ MODKEY|Mod1Mask,            XK_i,      incrigaps,      {.i = +1 } },
+  { MODKEY|Mod1Mask|ShiftMask,    XK_i,      incrigaps,      {.i = -1 } },
+  { MODKEY|Mod1Mask,              XK_o,      incrogaps,      {.i = +1 } },
+  { MODKEY|Mod1Mask|ShiftMask,    XK_o,      incrogaps,      {.i = -1 } },
+
+  { MODKEY|Mod1Mask,              XK_6,      incrihgaps,     {.i = +1 } },
+  { MODKEY|Mod1Mask|ShiftMask,    XK_6,      incrihgaps,     {.i = -1 } },
+  { MODKEY|Mod1Mask,              XK_7,      incrivgaps,     {.i = +1 } },
+  { MODKEY|Mod1Mask|ShiftMask,    XK_7,      incrivgaps,     {.i = -1 } },
+  { MODKEY|Mod1Mask,              XK_8,      incrohgaps,     {.i = +1 } },
+  { MODKEY|Mod1Mask|ShiftMask,    XK_8,      incrohgaps,     {.i = -1 } },
+  { MODKEY|Mod1Mask,              XK_9,      incrovgaps,     {.i = +1 } },
+  { MODKEY|Mod1Mask|ShiftMask,    XK_9,      incrovgaps,     {.i = -1 } },*/
+#+end_src
+
+** End of the keybindings
+This is just to end the keybindings function. Any header needs to be before this
+#+begin_src c
+  };
+#+end_src
+** Mouse definitions
+We can set keybindings for the mouse too.
+#+begin_src c
+  static Button buttons[] = {
+    /* click          event mask         button    function         argument */
+    { ClkLtSymbol,    0,                 Button1,  cyclelayout,     {.i = +1 } },
+    { ClkLtSymbol,    0,                 Button3,  setlayout,       {.v = &layouts[5]} },
+    { ClkWinTitle,    0,                 Button2,  zoom,            {0} },
+    { ClkStatusText,  0,                 Button1,  sigdwmblocks,    {.i = 1} },
+    { ClkStatusText,  0,                 Button2,  sigdwmblocks,    {.i = 2} },
+    { ClkStatusText,  0,                 Button3,  sigdwmblocks,    {.i = 3} },
+    { ClkClientWin,   MODKEY,            Button1,  movemouse,       {0} },
+    { ClkClientWin,   MODKEY,            Button2,  togglefloating,  {0} },
+    { ClkClientWin,   MODKEY,            Button3,  resizemouse,     {0} },
+    { ClkClientWin,   MODKEY|ShiftMask,  Button3,  dragcfact,       {0} },
+    { ClkTagBar,      0,                 Button1,  view,            {0} },
+    { ClkTagBar,      0,                 Button3,  toggleview,      {0} },
+    { ClkTagBar,      MODKEY,            Button1,  tag,             {0} },
+    { ClkTagBar,      MODKEY,            Button3,  toggletag,       {0} },
+    { ClkTagBar,      0,                 Button4,  cycleiconset,    {.i = +1 } },
+    { ClkTagBar,      0,                 Button5,  cycleiconset,    {.i = -1 } },
+    { ClkClientWin,   MODKEY,	       Button1,	 winview,	  {0} },
+  };
+#+end_src
+* IPC
+The [[https://dwm.suckless.org/patches/ipc/][IPC patch]] allows to send IPC messages throught a new binary called ~dwm-msg~. The available commands are defined here. Note that I added the ~xrdb~ command (not sure how).
+#+begin_src c
+  static  const char *ipcsockpath = "/tmp/dwm.sock";
+  static IPCCommand ipccommands[] = {
+    IPCCOMMAND(  view,            1,  {ARG_TYPE_UINT}   ),
+    IPCCOMMAND(  toggleview,      1,  {ARG_TYPE_UINT}   ),
+    IPCCOMMAND(  tag,             1,  {ARG_TYPE_UINT}   ),
+    IPCCOMMAND(  toggletag,       1,  {ARG_TYPE_UINT}   ),
+    IPCCOMMAND(  tagmon,          1,  {ARG_TYPE_UINT}   ),
+    IPCCOMMAND(  focusmon,        1,  {ARG_TYPE_SINT}   ),
+    IPCCOMMAND(  focusstack,      1,  {ARG_TYPE_SINT}   ),
+    IPCCOMMAND(  zoom,            1,  {ARG_TYPE_NONE}   ),
+    IPCCOMMAND(  incnmaster,      1,  {ARG_TYPE_SINT}   ),
+    IPCCOMMAND(  killclient,      1,  {ARG_TYPE_SINT}   ),
+    IPCCOMMAND(  togglefloating,  1,  {ARG_TYPE_NONE}   ),
+    IPCCOMMAND(  setmfact,        1,  {ARG_TYPE_FLOAT}  ),
+    IPCCOMMAND(  setlayoutsafe,   1,  {ARG_TYPE_PTR}    ),
+    IPCCOMMAND(  quit,            1,  {ARG_TYPE_NONE}   ),
+    IPCCOMMAND(  xrdb,		  1,  {ARG_TYPE_NONE}   )	    
+  };
+#+end_src
