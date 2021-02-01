@@ -20,13 +20,6 @@ My build has a lot of features I find useful and I use (almost all of) it everyd
 + And more...
 
 This README file is written in org-mode, so it's possible to read it on Emacs. This is also my ~config.h~ since I have documented that file here and it's created from this file. I did it to make it easier to modify and instead of a lot of comments, I can have more information here. To create ~config.h~ run ~M-x org-babel-tangle RET~.
-* Include and define
-Some features needs to be included in this file. Let's call them from here.
-- vanitygaps: It adds gaps
-- movestack: Allows to move windows
-- shiftview: Allows to move to the next tag with a keybinding.
-#+begin_src c
-#+end_src
 * Variables
 Here's some basic variables that defines some of the basics of dwm:
 - borderpx: The size of the border
