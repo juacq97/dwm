@@ -4,7 +4,7 @@
 * About this repo
 Here is my own build of dwm, the dynamic window manager. This is a backup of the source code so I can easily download it again. I decided to use it because I wanted to migrate from bspwm to something else, and after try some options, including awesomewm, xmonad and qtile, I found dwm the easiest to configure (yes, that's right).
 
-By default, dwm can be difficult to use. It has almost no features and lacks some basic ones that you can expect. Adding new features isn't too straight  foward either, since you need to apply some patches to the source code and solve conflicts by yourself. The good thing is that there's a lot of patches from different sources that you can apply, and most of the time the manual intervention consist only on copy and paste some code, so even if you don't know anything about C (like me) you can do it using just logic. Sometimes though, you need to solve issues like conflicts with other patches, so be prepared with git and mentalized that some patches requires a lot of work. A good way to know if a patch will be problematica is reading the ~.diff~ file: if there's a lot of "-" signs be prepared to have some bad times.
+By default, dwm can be difficult to use. It has almost no features and lacks some basic ones that you can expect. Adding new features isn't too straight  foward either, since you need to apply some patches to the source code and solve conflicts by yourself. The good thing is that there's a lot of patches from different sources that you can apply, and most of the time the manual intervention consist only on copy and paste some code, so even if you don't know anything about C (like me) you can do it using just logic. Sometimes though, you need to solve issues like conflicts with other patches, so be prepared with git and mentalized that some patches requires a lot of work. A good way to know if a patch will be problematic is reading the ~.diff~ file: if there's a lot of "-" signs be prepared to have some bad times.
 
 My build has a lot of features I find useful and I use (almost all of) it everyday. Here's a partial list of features I added:
 + Toggle all tags at the same time
@@ -49,7 +49,7 @@ Here's some basic variables that defines some of the basics of dwm:
   static const int nstack             = 0;
   static const int resizehints        = 0; 
   static const int user_bh            = 25; 
-  static const int user_tp            = 5;  
+  static const int user_tp            = 0;  
   static const int showbar            = 1;  
   static const int topbar             = 1;
   static const int attachmode         = 2; 
@@ -100,7 +100,7 @@ Here's some basic variables that defines some of the basics of dwm:
      [SchemeNorm]     = { fore,    back, back   }, // \x0b
      [SchemeSel]      = { fore,    back, border }, // \x0c
      [SchemeStatus]   = { fore,    back, border }, // \x0d
-     [SchemeTagsSel]  = { border,  back, border }, // \x0e
+     [SchemeTagsSel]  = { back,    border, border }, // \x0e
      [SchemeTagsNorm] = { fore,    back, border }, // \x0f
      [SchemeInfoSel]  = { fore,    back, border }, // \x10
      [SchemeInfoNorm] = { fore,    back, border }, // \x11
@@ -182,9 +182,9 @@ I'm using the  [[https://github.com/bakkeby/patches/wiki/tagicons][tagicons]] pa
 #+begin_src c
   static const char *tags[NUMTAGS] = { NULL };  /* left for compatibility reasons, i.e. code that checks LENGTH(tags) */
   static char *tagicons[][NUMTAGS] = {
-    [IconsDefault]  = { "󰧞", "󰧞", "󰧞", "󰧞", "󰧞", "󰧞" },
-    [IconsVacant]   = { NULL },
-    [IconsOccupied] = { "󰻂", "󰻂", "󰻂", "󰻂", "󰻂", "󰻂" },
+    [IconsDefault]  = { "" },
+    [IconsVacant]   = { "1", "2", "3", "4", "5", "6" },
+    [IconsOccupied] = { "1", "2", "3", "4", "5", "6" },
   };
 #+end_src
 
@@ -204,6 +204,7 @@ You can define a set of rules for certain windows. For example, I want mpv to al
     { "kruler",        NULL,       NULL,       0,         1,         NULL,    -1 },
     { "zoom",          NULL,       NULL,       0,         1,         NULL,    -1 },
     { "Connman-gtk",   NULL,       NULL,       0,         1,         NULL,    -1 },
+    { "Emacs",         "emacs",    "agenda",   0,          1,        NULL,    -1 },  
     { "Alacritty", "calendar.txt", NULL,       0,         1,         NULL,    -1 },
   };
 #+end_src
@@ -275,8 +276,11 @@ All the keybindings related to movement of windows. I'll explain here only the o
   { MODKEY,             XK_l,      setmfact,      {.f = +0.02} }, 
   { MODKEY|ControlMask, XK_comma,  incnmaster,    {.i = +1 } }, 
   { MODKEY|ControlMask, XK_period, incnmaster,    {.i = -1 } }, 
+  
   { MODKEY|ShiftMask,   XK_j,      movestack,     {.i = +1 } }, 
   { MODKEY|ShiftMask,   XK_k,      movestack,     {.i = -1 } }, 
+  { MODKEY|ControlMask|Mod1Mask, XK_comma,      incnstack,     {.i = -1 } },
+  { MODKEY|ControlMask|Mod1Mask, XK_period,     incnstack,     {.i = +1 } },
 #+end_src
 
 ** Tags
@@ -379,8 +383,6 @@ There some options and keybindings of some features of dwm... actually, I did't 
   { MODKEY,	      XK_z, scratchpad_show,    {0} },
   { MODKEY|Mod1Mask,    XK_z, scratchpad_hide,    {0} },
   { MODKEY|ControlMask, XK_z, scratchpad_remove,  {0} },
-  { MODKEY|ControlMask, XK_i, incnstack,          {.i = +1 } },
-  { MODKEY|ControlMask, XK_o, incnstack,          {.i = -1 } },
 #+end_src
 ** Gaps
 The [[https://github.com/bakkeby/patches/blob/master/dwm/dwm-vanitygaps-6.2.diff][vanity-gaps patch]] introduces a lot of options to change inner and outter gaps. I don't use it too much though.

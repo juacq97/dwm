@@ -1,5 +1,3 @@
-
-
 static const unsigned int borderpx  = 3;       
 static const unsigned int snap      = 6;      
 static const unsigned int gappih    = 10;      
@@ -11,7 +9,7 @@ static const int nmaster            = 1;
 static const int nstack             = 0;
 static const int resizehints        = 0; 
 static const int user_bh            = 25; 
-static const int user_tp            = 5;  
+static const int user_tp            = 0;  
 static const int showbar            = 1;  
 static const int topbar             = 1;
 static const int attachmode         = 2; 
@@ -49,7 +47,7 @@ static char *colors[][3] = {
   [SchemeNorm]     = { fore,    back, back   }, // \x0b
   [SchemeSel]      = { fore,    back, border }, // \x0c
   [SchemeStatus]   = { fore,    back, border }, // \x0d
-  [SchemeTagsSel]  = { border,  back, border }, // \x0e
+  [SchemeTagsSel]  = { back,    border, border }, // \x0e
   [SchemeTagsNorm] = { fore,    back, border }, // \x0f
   [SchemeInfoSel]  = { fore,    back, border }, // \x10
   [SchemeInfoNorm] = { fore,    back, border }, // \x11
@@ -116,9 +114,9 @@ static const unsigned int alphas[][3] = {
 
 static const char *tags[NUMTAGS] = { NULL };  /* left for compatibility reasons, i.e. code that checks LENGTH(tags) */
 static char *tagicons[][NUMTAGS] = {
-  [IconsDefault]  = { "󰧞", "󰧞", "󰧞", "󰧞", "󰧞", "󰧞" },
-  [IconsVacant]   = { NULL },
-  [IconsOccupied] = { "󰻂", "󰻂", "󰻂", "󰻂", "󰻂", "󰻂" },
+  [IconsDefault]  = { "" },
+  [IconsVacant]   = { "1", "2", "3", "4", "5", "6" },
+  [IconsOccupied] = { "1", "2", "3", "4", "5", "6" },
 };
 
 static const Rule rules[] = {
@@ -133,6 +131,7 @@ static const Rule rules[] = {
   { "kruler",        NULL,       NULL,       0,         1,         NULL,    -1 },
   { "zoom",          NULL,       NULL,       0,         1,         NULL,    -1 },
   { "Connman-gtk",   NULL,       NULL,       0,         1,         NULL,    -1 },
+  { "Emacs",         "emacs",    "agenda",   0,          1,        NULL,    -1 },  
   { "Alacritty", "calendar.txt", NULL,       0,         1,         NULL,    -1 },
 };
 
@@ -180,8 +179,11 @@ static Key keys[] = {
 { MODKEY,             XK_l,      setmfact,      {.f = +0.02} }, 
 { MODKEY|ControlMask, XK_comma,  incnmaster,    {.i = +1 } }, 
 { MODKEY|ControlMask, XK_period, incnmaster,    {.i = -1 } }, 
+
 { MODKEY|ShiftMask,   XK_j,      movestack,     {.i = +1 } }, 
-{ MODKEY|ShiftMask,   XK_k,      movestack,     {.i = -1 } },
+{ MODKEY|ShiftMask,   XK_k,      movestack,     {.i = -1 } }, 
+{ MODKEY|ControlMask|Mod1Mask, XK_comma,      incnstack,     {.i = -1 } },
+{ MODKEY|ControlMask|Mod1Mask, XK_period,     incnstack,     {.i = +1 } },
 
 { MODKEY,             XK_Tab, view,        {0} }, 
 { MODKEY,             XK_0,   view,        {.ui = ~0 } }, 
@@ -238,8 +240,6 @@ static Key keys[] = {
 { MODKEY,	      XK_z, scratchpad_show,    {0} },
 { MODKEY|Mod1Mask,    XK_z, scratchpad_hide,    {0} },
 { MODKEY|ControlMask, XK_z, scratchpad_remove,  {0} },
-{ MODKEY|ControlMask, XK_i, incnstack,          {.i = +1 } },
-{ MODKEY|ControlMask, XK_o, incnstack,          {.i = -1 } },
 
 { MODKEY|Mod1Mask,              XK_u,      incrgaps,       {.i = +1 } },
 { MODKEY|Mod1Mask|ShiftMask,    XK_u,      incrgaps,       {.i = -1 } },
