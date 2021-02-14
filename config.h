@@ -121,9 +121,8 @@ static char *tagicons[][NUMTAGS] = {
 
 static const Rule rules[] = {
   /* class        instance       title    tags mask  isfloating  floatpos monitor */
-  { "Gimp",          NULL,       NULL,       0,         1,         NULL,    -1 },
   { "mpv",           NULL,       NULL,       0,         1,         NULL,    -1 },
-  { "lxappareance",  NULL,       NULL,       0,         1,         NULL,    -1 },
+  { "Lxappareance",  NULL,       NULL,       0,         1,         NULL,    -1 },
   { "Pavucontrol",   NULL,       NULL,       0,         1,         NULL,    -1 },
   { "qt5ct",         NULL,       NULL,       0,         1,         NULL,    -1 },
   { "Gucharmap",     NULL,       NULL,       0,         1,         NULL,    -1 },
