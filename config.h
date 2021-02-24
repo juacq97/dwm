@@ -9,7 +9,7 @@ static const int nmaster            = 1;
 static const int nstack             = 0;
 static const int resizehints        = 0; 
 static const int user_bh            = 25; 
-static const int user_tp            = 0;  
+static const int user_tp            = 1;  
 static const int showbar            = 1;  
 static const int topbar             = 1;
 static const int attachmode         = 2; 
@@ -47,7 +47,7 @@ static char *colors[][3] = {
   [SchemeNorm]     = { fore,    back, back   }, // \x0b
   [SchemeSel]      = { fore,    back, border }, // \x0c
   [SchemeStatus]   = { fore,    back, border }, // \x0d
-  [SchemeTagsSel]  = { back,    border, border }, // \x0e
+  [SchemeTagsSel]  = { border,  back, border }, // \x0e
   [SchemeTagsNorm] = { fore,    back, border }, // \x0f
   [SchemeInfoSel]  = { fore,    back, border }, // \x10
   [SchemeInfoNorm] = { fore,    back, border }, // \x11
@@ -114,9 +114,11 @@ static const unsigned int alphas[][3] = {
 
 static const char *tags[NUMTAGS] = { NULL };  /* left for compatibility reasons, i.e. code that checks LENGTH(tags) */
 static char *tagicons[][NUMTAGS] = {
-  [IconsDefault]  = { "" },
-  [IconsVacant]   = { "1", "2", "3", "4", "5", "6" },
-  [IconsOccupied] = { "1", "2", "3", "4", "5", "6" },
+  [IconsDefault]  = { "󰧟" },
+  [IconsVacant]   = { "" },
+  [IconsOccupied] = { "󰧞" },
+  [IconsSelected] = { "󰑊" },
+
 };
 
 static const Rule rules[] = {
@@ -137,10 +139,11 @@ static const Rule rules[] = {
 #include "vanitygaps.c"
 static const Layout layouts[] = {
 /* symbol  arrange,  { nmaster, nstack, layout, master axis, stack axis, secondary stack axis } */
-  { "󰙀", flextile,  { -1, -1, SPLIT_VERTICAL, TOP_TO_BOTTOM, TOP_TO_BOTTOM, 0, NULL } }, // default tile layout
-  { "󱒅", flextile,  { -1, -1, SPLIT_CENTERED_VERTICAL, TOP_TO_BOTTOM, TOP_TO_BOTTOM, 0, NULL } }, // centeredmaster
-  { "󱒎", flextile,  { -1, -1, SPLIT_VERTICAL, TOP_TO_BOTTOM, GAPPLESSGRID_ALT1, 0, NULL } }, // Grid stack
-  { "󰋁", flextile,  { -1, -1, NO_SPLIT, GAPPLESSGRID, 0, 0, NULL } }, // gappless grid
+  { " 󰙀 ", flextile,  { -1, -1, SPLIT_VERTICAL, TOP_TO_BOTTOM, TOP_TO_BOTTOM, 0, NULL } }, // default tile layout
+  { " 󱒅 ", flextile,  { -1, -1, SPLIT_CENTERED_VERTICAL, TOP_TO_BOTTOM, TOP_TO_BOTTOM, 0, NULL } }, // centeredmaster
+  { " 󱒎 ", flextile,  { -1, -1, SPLIT_VERTICAL, TOP_TO_BOTTOM, GAPPLESSGRID_ALT1, 0, NULL } }, // Grid stack
+  { " 󰋁 ", flextile,  { -1, -1, NO_SPLIT, GAPPLESSGRID, 0, 0, NULL } }, // gappless grid
+  { " center ", centeredmaster, { 0 } },
   { NULL,   NULL,    {0} },
 };
 
@@ -154,6 +157,7 @@ static const Layout doublestack[] = {
 static const Layout full[] = {
   { "[M]", flextile, { -1, -1, NO_SPLIT, MONOCLE, 0, 0, monoclesymbols } }, // monocle
   { "[D]", flextile, { -1, -1, SPLIT_VERTICAL, TOP_TO_BOTTOM, MONOCLE, 0, NULL } }, // deck
+  { "deck", deck, { 0 } },
 };
 
 #define MODKEY Mod4Mask
@@ -201,7 +205,7 @@ static Key keys[] = {
 
 { MODKEY,  XK_t,    setlayout,         {.v = &layouts[0]} }, 
 { MODKEY,  XK_bar, mirrorlayout,      {0} },           
-{ MODKEY,  XK_m,   setlayout,         {.v = &full[0]} }, 
+{ MODKEY,  XK_m,   setlayout,         {.v = &full[2]} }, 
 { MODKEY,  XK_s,   togglefloating,    {0} }, 
 { MODKEY,  XK_F11, togglefullscreen,  {0} }, 
 

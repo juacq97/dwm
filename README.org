@@ -31,7 +31,7 @@ Here's some basic variables that defines some of the basics of dwm:
 - resizehints: Those hints indicates to the window manager to keep certain size. I don't like it.
 - Smartgaps: 1 means no gaps with just one window
 - user_bh: This is a variable of mine and determines the height of the top panel. 0 mens height equals to the font size (default).
-- user_top: Another variable I added. Determines the padding between tag numbers. 0 means default padding.
+- user_tp: Another variable I added. Determines the padding between tag numbers. 0 means default padding.
 - showbar: 0 means no bar
 - topbar: 0 means bottom bar
 - attachmode: How the new windows should be attached: 0 means master, 1 means above the focused window, 2 means on top of the stack, 3 means below the focused window and 4 means at the bottom of the stack
@@ -49,7 +49,7 @@ Here's some basic variables that defines some of the basics of dwm:
   static const int nstack             = 0;
   static const int resizehints        = 0; 
   static const int user_bh            = 25; 
-  static const int user_tp            = 0;  
+  static const int user_tp            = 1;  
   static const int showbar            = 1;  
   static const int topbar             = 1;
   static const int attachmode         = 2; 
@@ -100,7 +100,7 @@ Here's some basic variables that defines some of the basics of dwm:
      [SchemeNorm]     = { fore,    back, back   }, // \x0b
      [SchemeSel]      = { fore,    back, border }, // \x0c
      [SchemeStatus]   = { fore,    back, border }, // \x0d
-     [SchemeTagsSel]  = { back,    border, border }, // \x0e
+     [SchemeTagsSel]  = { border,  back, border }, // \x0e
      [SchemeTagsNorm] = { fore,    back, border }, // \x0f
      [SchemeInfoSel]  = { fore,    back, border }, // \x10
      [SchemeInfoNorm] = { fore,    back, border }, // \x11
@@ -182,9 +182,11 @@ I'm using the  [[https://github.com/bakkeby/patches/wiki/tagicons][tagicons]] pa
 #+begin_src c
   static const char *tags[NUMTAGS] = { NULL };  /* left for compatibility reasons, i.e. code that checks LENGTH(tags) */
   static char *tagicons[][NUMTAGS] = {
-    [IconsDefault]  = { "" },
-    [IconsVacant]   = { "1", "2", "3", "4", "5", "6" },
-    [IconsOccupied] = { "1", "2", "3", "4", "5", "6" },
+    [IconsDefault]  = { "󰧟" },
+    [IconsVacant]   = { "" },
+    [IconsOccupied] = { "󰧞" },
+    [IconsSelected] = { "󰑊" },
+
   };
 #+end_src
 
@@ -215,10 +217,10 @@ I have defined three arrays of layouts. This way I can cycle for one array with 
   #include "vanitygaps.c"
   static const Layout layouts[] = {
   /* symbol  arrange,  { nmaster, nstack, layout, master axis, stack axis, secondary stack axis } */
-    { "󰙀", flextile,  { -1, -1, SPLIT_VERTICAL, TOP_TO_BOTTOM, TOP_TO_BOTTOM, 0, NULL } }, // default tile layout
-    { "󱒅", flextile,  { -1, -1, SPLIT_CENTERED_VERTICAL, TOP_TO_BOTTOM, TOP_TO_BOTTOM, 0, NULL } }, // centeredmaster
-    { "󱒎", flextile,  { -1, -1, SPLIT_VERTICAL, TOP_TO_BOTTOM, GAPPLESSGRID_ALT1, 0, NULL } }, // Grid stack
-    { "󰋁", flextile,  { -1, -1, NO_SPLIT, GAPPLESSGRID, 0, 0, NULL } }, // gappless grid
+    { " 󰙀 ", flextile,  { -1, -1, SPLIT_VERTICAL, TOP_TO_BOTTOM, TOP_TO_BOTTOM, 0, NULL } }, // default tile layout
+    { " 󱒅 ", flextile,  { -1, -1, SPLIT_CENTERED_VERTICAL, TOP_TO_BOTTOM, TOP_TO_BOTTOM, 0, NULL } }, // centeredmaster
+    { " 󱒎 ", flextile,  { -1, -1, SPLIT_VERTICAL, TOP_TO_BOTTOM, GAPPLESSGRID_ALT1, 0, NULL } }, // Grid stack
+    { " 󰋁 ", flextile,  { -1, -1, NO_SPLIT, GAPPLESSGRID, 0, 0, NULL } }, // gappless grid
     { NULL,   NULL,    {0} },
   };
 
@@ -458,3 +460,4 @@ The [[https://dwm.suckless.org/patches/ipc/][IPC patch]] allows to send IPC mess
     IPCCOMMAND(  xrdb,		  1,  {ARG_TYPE_NONE}   )	    
   };
 #+end_src
+
