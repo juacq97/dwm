@@ -45,7 +45,7 @@ install: all
 	chmod 755 ~/.local/dwm
 	chmod 755 ~/.local/dwm-msg
 	pkill dwm
-	~/.local/dwmblocks &
+	setsid ~/.local/dwmblocks
 
 uninstall:
 	rm -f ${DESTDIR}${PREFIX}/bin/dwm\

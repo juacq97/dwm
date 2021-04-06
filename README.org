@@ -40,8 +40,8 @@ Here's some basic variables that defines some of the basics of dwm:
 #+begin_src c
   static const unsigned int borderpx  = 3;       
   static const unsigned int snap      = 6;      
-  static const unsigned int gappih    = 10;      
-  static const unsigned int gappiv    = 10;      
+  static const unsigned int gappih    = 7;      
+  static const unsigned int gappiv    = 7;      
   static const unsigned int gappoh    = 6;      
   static const unsigned int gappov    = 6;      
   static const float mfact            = 0.5; 
@@ -52,7 +52,7 @@ Here's some basic variables that defines some of the basics of dwm:
   static const int user_tp            = 1;  
   static const int showbar            = 1;  
   static const int topbar             = 1;
-  static const int attachmode         = 2; 
+  static const int attachmode         = 1; 
   static int smartgaps                = 0;  
   static int floatposgrid_x           = 5;  
   static int floatposgrid_y           = 5;  
