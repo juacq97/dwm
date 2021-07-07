@@ -232,11 +232,15 @@ static Key keys[] = {
 //{ MODKEY|Mod1Mask|ControlMask, XK_comma,  tagswapmon,     {.i = +1 } }, 
 //{ MODKEY|Mod1Mask|ControlMask, XK_period, tagswapmon,     {.i = -1 } },
 
-{ MODKEY,          XK_b,  togglebar, {0} }, 
+{ MODKEY,          XK_v,  togglebar, {0} }, 
 { MODKEY|Mod1Mask, XK_l,  setcfact,  {.f = +0.25} }, 
 { MODKEY|Mod1Mask, XK_h,  setcfact,  {.f = -0.25} }, 
 { MODKEY|Mod1Mask, XK_o,  setcfact,  {.f =  0.00} },
 { MODKEY,          XK_F8, xrdb,      {.v = NULL } },
+
+{ MODKEY|ShiftMask, XK_plus,  setborderpx,  {.i = +1 } },
+{ MODKEY|ShiftMask, XK_minus,  setborderpx,  {.i = -1 } },
+{ MODKEY|ControlMask|ShiftMask, XK_minus,  setborderpx,  {.i = 0 } },
 
 { MODKEY,	      XK_z, scratchpad_show,    {0} },
 { MODKEY|Mod1Mask,    XK_z, scratchpad_hide,    {0} },

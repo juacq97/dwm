@@ -1,46 +1,27 @@
---- dwm.c
-+++ dwm.c
-@@ -55,6 +55,7 @@
- #define WIDTH(X)                ((X)->w + 2 * (X)->bw)
- #define HEIGHT(X)               ((X)->h + 2 * (X)->bw)
- #define TAGMASK                 ((1 << LENGTH(tags)) - 1)
-+#define TAGSLENGTH              (LENGTH(tags))
- #define TEXTW(X)                (drw_fontset_getwidth(drw, (X)) + lrpad)
+--- dwm.c	2020-05-12 02:17:20.070933833 +0200
++++ dwm.c	2020-05-14 00:17:35.047919771 +0200
+@@ -119,6 +119,7 @@ struct Monitor {
+ 	int by;               /* bar geometry */
+ 	int mx, my, mw, mh;   /* screen size */
+ 	int wx, wy, ww, wh;   /* window area  */
++	unsigned int borderpx;
+ 	unsigned int seltags;
+ 	unsigned int sellt;
+ 	unsigned int tagset[2];
+@@ -639,6 +641,7 @@ createmon(void)
+ 	m->nmaster = nmaster;
+ 	m->showbar = showbar;
+ 	m->topbar = topbar;
++	m->borderpx = borderpx;
+ 	m->lt[0] = &layouts[0];
+ 	m->lt[1] = &layouts[1 % LENGTH(layouts)];
+ 	strncpy(m->ltsymbol, layouts[0].symbol, sizeof m->ltsymbol);
+@@ -1048,7 +1051,7 @@ manage(Window w, XWindowAttributes *wa)
+ 	/* only fix client y-offset, if the client center might cover the bar */
+ 	c->y = MAX(c->y, ((c->mon->by == c->mon->my) && (c->x + (c->w / 2) >= c->mon->wx)
+ 		&& (c->x + (c->w / 2) < c->mon->wx + c->mon->ww)) ? bh : c->mon->my);
+-	c->bw = borderpx;
++	c->bw = c->mon->borderpx;
  
- /* enums */
-@@ -62,7 +63,7 @@ enum { CurNormal, CurResize, CurMove, CurLast }; /* cursor */
- enum { SchemeNorm, SchemeSel }; /* color schemes */
- enum { NetSupported, NetWMName, NetWMState, NetWMCheck,
-        NetWMFullscreen, NetActiveWindow, NetWMWindowType,
--       NetWMWindowTypeDialog, NetClientList, NetLast }; /* EWMH atoms */
-+       NetWMWindowTypeDialog, NetClientList, NetDesktopNames, NetDesktopViewport, NetNumberOfDesktops, NetCurrentDesktop, NetLast }; /* EWMH atoms */
- enum { WMProtocols, WMDelete, WMState, WMTakeFocus, WMLast }; /* default atoms */
- enum { ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle,
-        ClkClientWin, ClkRootWin, ClkLast }; /* clicks */
-@@ -197,11 +198,15 @@ static void scan(void);
- static int sendevent(Client *c, Atom proto);
- static void sendmon(Client *c, Monitor *m);
- static void setclientstate(Client *c, long state);
-+static void setcurrentdesktop(void);
-+static void setdesktopnames(void);
- static void setfocus(Client *c);
- static void setfullscreen(Client *c, int fullscreen);
- static void setlayout(const Arg *arg);
- static void setmfact(const Arg *arg);
-+static void setnumdesktops(void);
- static void setup(void);
-+static void setviewport(void);
- static void seturgent(Client *c, int urg);
- static void showhide(Client *c);
- static void sigchld(int unused);
-@@ -1579,6 +1601,10 @@ setup(void)
- 	netatom[NetWMWindowType] = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE", False);
- 	netatom[NetWMWindowTypeDialog] = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE_DIALOG", False);
- 	netatom[NetClientList] = XInternAtom(dpy, "_NET_CLIENT_LIST", False);
-+	netatom[NetDesktopViewport] = XInternAtom(dpy, "_NET_DESKTOP_VIEWPORT", False);
-+	netatom[NetNumberOfDesktops] = XInternAtom(dpy, "_NET_NUMBER_OF_DESKTOPS", False);
-+	netatom[NetCurrentDesktop] = XInternAtom(dpy, "_NET_CURRENT_DESKTOP", False);
-+	netatom[NetDesktopNames] = XInternAtom(dpy, "_NET_DESKTOP_NAMES", False);
- 	/* init cursors */
- 	cursor[CurNormal] = drw_cur_create(drw, XC_left_ptr);
- 	cursor[CurResize] = drw_cur_create(drw, XC_sizing);
+ 	wc.border_width = c->bw;
+ 	XConfigureWindow(dpy, w, CWBorderWidth, &wc);
