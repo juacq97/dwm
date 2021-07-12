@@ -165,24 +165,25 @@ static const Layout full[] = {
   { MODKEY|ShiftMask,   KEY, tag,        {.ui = 1 << TAG} }, \
   { MODKEY|ControlMask, KEY, toggletag,  {.ui = 1 << TAG} },
 
-#include "movestack.c"
 #include "shiftview.c"
 static Key keys[] = {
 
 { MODKEY|ShiftMask,   XK_q,      killclient,    {0} }, 
-{ MODKEY,             XK_j,      focusstack,    {.i = +1 } }, 
-{ MODKEY,             XK_k,      focusstack,    {.i = -1 } },
+{ MODKEY,             XK_h,      focusdir,       {.i = 0 } }, // left
+{ MODKEY,             XK_l,      focusdir,       {.i = 1 } }, // right
+{ MODKEY,             XK_k,      focusdir,       {.i = 2 } }, // up
+{ MODKEY,             XK_j,      focusdir,       {.i = 3 } }, // down
 { MODKEY|ControlMask, XK_j,      inplacerotate, {.i = +1} }, 
 { MODKEY|ControlMask, XK_k,      inplacerotate, {.i = -1} }, 
 { MODKEY|ShiftMask,   XK_g,      zoom,          {0} }, 
 { MODKEY,             XK_g,      switchcol,     {0} }, 
-{ MODKEY,             XK_h,      setmfact,      {.f = -0.02} }, 
-{ MODKEY,             XK_l,      setmfact,      {.f = +0.02} }, 
 { MODKEY|ControlMask, XK_comma,  incnmaster,    {.i = +1 } }, 
 { MODKEY|ControlMask, XK_period, incnmaster,    {.i = -1 } }, 
 
-{ MODKEY|ShiftMask,   XK_j,      movestack,     {.i = +1 } }, 
-{ MODKEY|ShiftMask,   XK_k,      movestack,     {.i = -1 } }, 
+{ MODKEY|ShiftMask,           XK_h,           placedir,       {.i = 0 } }, // left
+{ MODKEY|ShiftMask,           XK_l,           placedir,       {.i = 1 } }, // right
+{ MODKEY|ShiftMask,           XK_k,           placedir,       {.i = 2 } }, // up
+{ MODKEY|ShiftMask,           XK_j,           placedir,       {.i = 3 } }, // down
 { MODKEY|ControlMask|Mod1Mask, XK_comma,      incnstack,     {.i = -1 } },
 { MODKEY|ControlMask|Mod1Mask, XK_period,     incnstack,     {.i = +1 } },
 
@@ -228,14 +229,14 @@ static Key keys[] = {
 { MODKEY,                      XK_comma,  focusmon,       {.i = -1 } }, 
 { MODKEY,                      XK_period, focusmon,       {.i = +1 } }, 
 { MODKEY|ShiftMask,            XK_comma,  tagmon,         {.i = -1 } }, 
-{ MODKEY|ShiftMask,            XK_period, tagmon,         {.i = +1 } }, 
-// { MODKEY|Mod1Mask|ControlMask, XK_comma,  tagswapmon,     {.i = +1 } }, 
-// { MODKEY|Mod1Mask|ControlMask, XK_period, tagswapmon,     {.i = -1 } },
+{ MODKEY|ShiftMask,            XK_period, tagmon,         {.i = +1 } },
 
 { MODKEY,          XK_v,  togglebar, {0} }, 
-{ MODKEY|Mod1Mask, XK_k,  setcfact,  {.f = +0.25} }, 
-{ MODKEY|Mod1Mask, XK_j,  setcfact,  {.f = -0.25} }, 
-{ MODKEY|Mod1Mask, XK_o,  setcfact,  {.f =  0.00} },
+{ MODKEY|ControlMask|Mod1Mask, XK_k,  setcfact,  {.f = +0.25} }, 
+{ MODKEY|ControlMask|Mod1Mask, XK_j,  setcfact,  {.f = -0.25} }, 
+{ MODKEY|ControlMask|Mod1Mask, XK_o,  setcfact,  {.f =  0.00} },
+{ MODKEY|ControlMask|Mod1Mask,   XK_h,      setmfact,      {.f = -0.02} }, 
+{ MODKEY|ControlMask|Mod1Mask,   XK_l,      setmfact,      {.f = +0.02} }, 
 { MODKEY,          XK_F8, xrdb,      {.v = NULL } },
 
 { MODKEY|ShiftMask, XK_plus,  setborderpx,  {.i = +1 } },
