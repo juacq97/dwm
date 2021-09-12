@@ -17,8 +17,8 @@ static int smartgaps                = 0;
 static int floatposgrid_x           = 5;  
 static int floatposgrid_y           = 5;  
 static const char *fonts[]          = {
-  "Futura Bk BT:Book:size=10",
-  "Material Design Icons:Regular:pixelsize=14:antialias=true"
+  "Futura Bk BT:size=10:antialias=true",
+  "Material Design Icons:Regular:pixelsize=15:antialias=true"
 };
 
 static char back[]   = "#1C1E27";
@@ -160,9 +160,9 @@ static const Layout full[] = {
 
 #define MODKEY Mod4Mask
 #define TAGKEYS(KEY,TAG)\
-  { MODKEY,             KEY, view,       {.ui = 1 << TAG} }, \
+  { MODKEY,             KEY, comboview,  {.ui = 1 << TAG} }, \
   { MODKEY|Mod1Mask,	KEY, toggleview, {.ui = 1 << TAG} }, \
-  { MODKEY|ShiftMask,   KEY, tag,        {.ui = 1 << TAG} }, \
+  { MODKEY|ShiftMask,   KEY, combotag,   {.ui = 1 << TAG} }, \
   { MODKEY|ControlMask, KEY, toggletag,  {.ui = 1 << TAG} },
 
 #include "shiftview.c"
@@ -274,9 +274,11 @@ static Button buttons[] = {
   { ClkLtSymbol,    0,                 Button1,  cyclelayout,     {.i = +1 } },
   { ClkLtSymbol,    0,                 Button3,  setlayout,       {.v = &layouts[5]} },
   { ClkWinTitle,    0,                 Button2,  zoom,            {0} },
-  { ClkStatusText,  0,                 Button1,  sigdwmblocks,    {.i = 1} },
-  { ClkStatusText,  0,                 Button2,  sigdwmblocks,    {.i = 2} },
-  { ClkStatusText,  0,                 Button3,  sigdwmblocks,    {.i = 3} },
+{ ClkStatusText,  0,                   Button1,  sigdwmblocks,    {.i = 1} },
+{ ClkStatusText,  0,                   Button2,  sigdwmblocks,    {.i = 2} },
+{ ClkStatusText,  0,                   Button3,  sigdwmblocks,    {.i = 3} },
+{ ClkStatusText,  0,                   Button4,  sigdwmblocks,    {.i = 4} },
+{ ClkStatusText,  0,                   Button5,  sigdwmblocks,    {.i = 5} },
   { ClkClientWin,   MODKEY,            Button1,  movemouse,       {0} },
   { ClkClientWin,   MODKEY,            Button2,  togglefloating,  {0} },
   { ClkClientWin,   MODKEY,            Button3,  resizemouse,     {0} },
